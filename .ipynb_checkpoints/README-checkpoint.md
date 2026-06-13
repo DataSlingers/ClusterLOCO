@@ -1,4 +1,4 @@
-# Cluster LOCO feature importances for interpretability of clustering solutions via data splitting and minipatch ensembles.
+# Cluster LOCO: Feature Importance for Interpreting Clusters
 
 `clim` is a Python package for Cluster LOCO feature importance methods for clustering interpretability.
 Cluster LOCO is a model-agnostic framework for quantifying feature importance in clustering. The package provides methods that evaluate how much removing a feature affects the generalizability and stability of a clustering solution, enabling feature-level interpretation for unsupervised learning workflows.
@@ -38,22 +38,10 @@ Optional experiment dependencies include:
 anndata
 scanpy
 ```
-### Package structure
-```
-ClusterLOCO/
-├── pyproject.toml
-├── README.md
-└── clim/
-    ├── __init__.py
-    ├── minipatches/
-    ├── data_splitting/
-    ├── models/
-    └── utils/
-```
 
 ## Get started
 
-The package offers Cluster LOCO via data splitting, via minipatches and with adaptive recursive trimming. 
+The package offers Cluster LOCO via data splitting, via minipatches and with adaptive recursive trimming. Two example notebooks for running our models are available under the `example` folder with simulated data and a real application to PBMC 68k data. For the latter you will need to install `anndata` and `scanpy`. 
 
 ### Cluster LOCO Split 
 Cluster LOCO Split is recommended for data with *few features* (less than 10 features). 
@@ -133,6 +121,25 @@ This installs additional packages such as:
 anndata
 scanpy
 ```
+
+### Package structure
+```
+ClusterLOCO/
+├── pyproject.toml
+├── README.md
+└── clim/
+    ├── __init__.py
+    ├── minipatches/
+    ├── data_splitting/
+    ├── models/
+    └── utils/
+└── benchmarking/
+└── simulations/
+└── example/
+└── paper_figures/
+```
+
+This repository additionally contains code to reproduce the results from our paper: the folder `paper_figures` contains the notebook to make the main figures from our paper. 
 
 ## Citation
 
