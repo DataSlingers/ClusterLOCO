@@ -20,7 +20,6 @@ pip install -e ".[experiments]"
 ###  Requirements
 
 The core package requires Python 3.10 or higher.
-
 Core dependencies include:
 ```
 numpy
@@ -141,8 +140,7 @@ If you use this package, please cite the corresponding Cluster LOCO paper.
 ```
 @article{he2026clusterloco,
   title={Cluster LOCO: Feature Importance for Interpreting Clusters},
-  author={He, Claire and collaborators},
-  journal={},
+  author={He, Claire and Allen, Genevera},
   year={2026}
 }
 ```
