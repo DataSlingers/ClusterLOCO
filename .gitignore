@@ -1,0 +1,68 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Editable install metadata
+pip-wheel-metadata/
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Type checking / linting caches
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# IDE / editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
+
+# Data / experiment outputs
+data/
+results/
+outputs/
+figures/
+plots/
+checkpoints/
+
+# Large scientific data files
+*.h5ad
+*.h5
+*.hdf5
+*.loom
+*.mtx
+*.npz
+*.npy
+*.pkl
+*.pickle
+*.joblib
+
+# Local environment variables
+.env
+.env.*
