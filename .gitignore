@@ -66,3 +66,9 @@ checkpoints/
 # Local environment variables
 .env
 .env.*
+benchmarking/.DS_Store
+clim/.DS_Store
+clim/utils/.DS_Store
+paper_figures/.DS_Store
+simulations/.DS_Store
+simulations/.DS_Store
