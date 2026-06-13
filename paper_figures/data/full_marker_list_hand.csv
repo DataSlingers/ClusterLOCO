@@ -1,0 +1,276 @@
+,Cell type,Gene,Source
+0,CD4+/CD45RA+/CD25- Naive T,CD3D,Levin2018
+1,CD4+/CD45RA+/CD25- Naive T,CD3E,Levin2018
+2,CD4+/CD45RA+/CD25- Naive T,CD3G,Levin2018
+3,CD4+/CD45RA+/CD25- Naive T,TRAC,Levin2018
+4,CD4+/CD45RA+/CD25- Naive T,CD4,Levin2018
+5,CD4+/CD45RA+/CD25- Naive T,TCF7,Levin2018
+6,CD4+/CD45RA+/CD25- Naive T,CD27,Levin2018
+7,CD4+/CD45RA+/CD25- Naive T,IL7R,Levin2018
+8,CD4+/CD45RA+/CD25- Naive T,CD8A,Levin2018
+9,CD4+/CD45RA+/CD25- Naive T,CD8B,Levin2018
+10,CD4+/CD45RA+/CD25- Naive T,GNLY,Levin2018
+11,CD4+/CD45RA+/CD25- Naive T,NKG7,Levin2018
+12,CD4+/CD45RA+/CD25- Naive T,CST7,Levin2018
+13,CD8+ Cytotoxic T,CD3D,Levin2018
+14,CD8+ Cytotoxic T,CD3E,Levin2018
+15,CD8+ Cytotoxic T,CD3G,Levin2018
+16,CD8+ Cytotoxic T,TRAC,Levin2018
+17,CD8+ Cytotoxic T,CD8A,Levin2018
+18,CD8+ Cytotoxic T,CD8B,Levin2018
+19,CD8+ Cytotoxic T,GZMK,Levin2018
+20,CD8+ Cytotoxic T,CCL5,Levin2018
+21,CD8+ Cytotoxic T,NKG7,Levin2018
+22,CD8+ Cytotoxic T,CD4,Levin2018
+23,CD8+ Cytotoxic T,FCER1G,Levin2018
+24,CD19+ B,CD19,Levin2018
+25,CD19+ B,MS4A1,Levin2018
+26,CD19+ B,CD79A,Levin2018
+27,CD19+ B,CD79B,Levin2018
+28,CD19+ B,MZB1,Levin2018
+29,CD19+ B,IGHD,Levin2018
+30,CD19+ B,IGHM,Levin2018
+31,CD56+ NK,NCAM1,Levin2018
+32,CD56+ NK,NKG7,Levin2018
+33,CD56+ NK,KLRB1,Levin2018
+34,CD56+ NK,KLRD1,Levin2018
+35,CD56+ NK,KLRF1,Levin2018
+36,CD56+ NK,KLRC1,Levin2018
+37,CD56+ NK,KLRC2,Levin2018
+38,CD56+ NK,KLRC3,Levin2018
+39,CD56+ NK,KLRC4,Levin2018
+40,CD56+ NK,CD3D,Levin2018
+41,CD56+ NK,CD3E,Levin2018
+42,CD56+ NK,CD3G,Levin2018
+43,CD56+ NK,CD14,Levin2018
+44,CD56+ NK,FCGR3A,Levin2018
+45,CD56+ NK,FCGR3B,Levin2018
+46,CD56+ NK,ITGAL,Levin2018
+47,CD56+ NK,ITGAM,Levin2018
+48,CD56+ NK,FCER1G,Levin2018
+49,CD56+ NK,TRAC,Levin2018
+50,CD14+ Monocyte,VCAN,Levin2018
+51,CD14+ Monocyte,FCN1,Levin2018
+52,CD14+ Monocyte,S100A8,Levin2018
+53,CD14+ Monocyte,S100A9,Levin2018
+54,CD14+ Monocyte,CD14,Levin2018
+55,CD14+ Monocyte,ITGAL,Levin2018
+56,CD14+ Monocyte,ITGAM,Levin2018
+57,CD14+ Monocyte,CSF3R,Levin2018
+58,CD14+ Monocyte,CSF1R,Levin2018
+59,CD14+ Monocyte,CX3CR1,Levin2018
+60,CD14+ Monocyte,FCGR3A,Levin2018
+61,CD14+ Monocyte,FCGR3B,Levin2018
+62,CD14+ Monocyte,TYROBP,Levin2018
+63,CD14+ Monocyte,LYZ,Levin2018
+64,CD14+ Monocyte,S100A12,Levin2018
+65,CD14+ Monocyte,CD3D,Levin2018
+66,CD14+ Monocyte,CD3E,Levin2018
+67,CD14+ Monocyte,CD3G,Levin2018
+68,CD14+ Monocyte,TRAC,Levin2018
+69,CD14+ Monocyte,NKG7,Levin2018
+70,CD14+ Monocyte,KLRB1,Levin2018
+71,CD14+ Monocyte,KLRD1,Levin2018
+72,Dendritic,HLA-DPB1,Levin2018
+73,Dendritic,HLA-DPA1,Levin2018
+74,Dendritic,HLA-DQA1,Levin2018
+75,Dendritic,ITGAX,Levin2018
+76,Dendritic,CD3D,Levin2018
+77,Dendritic,CD3E,Levin2018
+78,Dendritic,CD3G,Levin2018
+79,Dendritic,NCAM1,Levin2018
+80,Dendritic,CD19,Levin2018
+81,Dendritic,CD14,Levin2018
+82,Dendritic,CD1C,Levin2018
+83,Dendritic,CD1E,Levin2018
+84,Dendritic,FCER1A,Levin2018
+85,Dendritic,CLEC10A,Levin2018
+86,Dendritic,FCGR2B,Levin2018
+87,Dendritic,MS4A1,Levin2018
+88,Dendritic,CD79A,Levin2018
+89,Dendritic,CD79B,Levin2018
+90,CD4+/CD45RA+/CD25- Naive T,I,Scanpy
+91,CD4+/CD45RA+/CD25- Naive T,L,Scanpy
+92,CD4+/CD45RA+/CD25- Naive T,7,Scanpy
+93,CD4+/CD45RA+/CD25- Naive T,R,Scanpy
+94,CD19+ B,CD79A,Scanpy
+95,CD19+ B,MS4A1,Scanpy
+96,CD8+ Cytotoxic T,CD8A,Scanpy
+97,CD8+ Cytotoxic T,CD8B,Scanpy
+98,CD8+ Cytotoxic T,CD8,Scanpy
+99,CD8+ Cytotoxic T,CD7,Scanpy
+100,CD14+ Monocyte,CD14,Scanpy
+101,CD14+ Monocyte,LYZ,Scanpy
+102,CD14+ Monocyte,LGALS3,Scanpy
+103,CD14+ Monocyte,S100A8,Scanpy
+104,CD56+ NK,GNLY,Scanpy
+105,CD56+ NK,NKG7,Scanpy
+106,CD56+ NK,KLRB1,Scanpy
+107,Dendritic,FCER1A,Scanpy
+108,Dendritic,CST3,Scanpy
+109,CD14+ Monocyte,S100A9,Azimuth
+110,CD14+ Monocyte,CTSS,Azimuth
+111,CD14+ Monocyte,S100A8,Azimuth
+112,CD14+ Monocyte,LYZ,Azimuth
+113,CD14+ Monocyte,VCAN,Azimuth
+114,CD14+ Monocyte,S100A12,Azimuth
+115,CD14+ Monocyte,IL1B,Azimuth
+116,CD14+ Monocyte,CD14,Azimuth
+117,CD14+ Monocyte,G0S2,Azimuth
+118,CD14+ Monocyte,FCN1,Azimuth
+119,CD56+ NK,NKG7,Azimuth
+120,CD56+ NK,KLRD1,Azimuth
+121,CD56+ NK,TYROBP,Azimuth
+122,CD56+ NK,GNLY,Azimuth
+123,CD56+ NK,FCER1G,Azimuth
+124,CD56+ NK,PRF1,Azimuth
+125,CD56+ NK,CD247,Azimuth
+126,CD56+ NK,KLRF1,Azimuth
+127,CD56+ NK,CST7,Azimuth
+128,CD56+ NK,GZMB,Azimuth
+129,CD56+ NK,MKI67,Azimuth
+130,CD56+ NK,TYMS,Azimuth
+131,CD56+ NK,TRDC,Azimuth
+132,CD56+ NK,TOP2A,Azimuth
+133,CD56+ NK,PCLAF,Azimuth
+134,CD56+ NK,CD247,Azimuth
+135,CD56+ NK,CLSPN,Azimuth
+136,CD56+ NK,ASPM,Azimuth
+137,CD56+ NK,FGFBP2,Azimuth
+138,CD56+ NK,SPON2,Azimuth
+139,CD56+ NK,XCL2,Azimuth
+140,CD56+ NK,SPINK2,Azimuth
+141,CD56+ NK,KLRC1,Azimuth
+142,CD56+ NK,XCL1,Azimuth
+143,CD56+ NK,SPTSSB,Azimuth
+144,CD56+ NK,PPP1R9A,Azimuth
+145,CD56+ NK,NCAM1,Azimuth
+146,CD56+ NK,TNFRSF11A,Azimuth
+147,CD19+ B,IGHM,Azimuth
+148,CD19+ B,IGHD,Azimuth
+149,CD19+ B,CD79A,Azimuth
+150,CD19+ B,IL4R,Azimuth
+151,CD19+ B,MS4A1,Azimuth
+152,CD19+ B,CXCR4,Azimuth
+153,CD19+ B,BTG1,Azimuth
+154,CD19+ B,TCL1A,Azimuth
+155,CD19+ B,CD79B,Azimuth
+156,CD19+ B,YBX3,Azimuth
+157,CD19+ B,COCH,Azimuth
+158,CD19+ B,AIM2,Azimuth
+159,CD19+ B,BANK1,Azimuth
+160,CD19+ B,SSPN,Azimuth
+161,CD19+ B,CD79A,Azimuth
+162,CD19+ B,TEX9,Azimuth
+163,CD19+ B,RALGPS2,Azimuth
+164,CD19+ B,TNFRSF13C,Azimuth
+165,CD19+ B,LINC01781,Azimuth
+166,CD19+ B,TNFRSF13B,Azimuth
+167,CD19+ B,RALGPS2,Azimuth
+168,CD19+ B,CD79B,Azimuth
+169,CD4+/CD45RO+ Memory,IL7R,Azimuth
+170,CD4+/CD45RO+ Memory,TMSB10,Azimuth
+171,CD4+/CD45RO+ Memory,CD4,Azimuth
+172,CD4+/CD45RO+ Memory,ITGB1,Azimuth
+173,CD4+/CD45RO+ Memory,LTB,Azimuth
+174,CD4+/CD45RO+ Memory,TRAC,Azimuth
+175,CD4+/CD45RO+ Memory,AQP3,Azimuth
+176,CD4+/CD45RO+ Memory,LDHB,Azimuth
+177,CD4+/CD45RO+ Memory,IL32,Azimuth
+178,CD4+/CD45RO+ Memory,MAL,Azimuth
+179,CD4+/CD45RO+ Memory,CCL5,Azimuth
+180,CD4+/CD45RO+ Memory,FYB1,Azimuth
+181,CD4+/CD45RO+ Memory,GZMK,Azimuth
+182,CD4+/CD45RO+ Memory,IL32,Azimuth
+183,CD4+/CD45RO+ Memory,GZMA,Azimuth
+184,CD4+/CD45RO+ Memory,KLRB1,Azimuth
+185,CD4+/CD25 T Reg,RTKN2,Azimuth
+186,CD4+/CD25 T Reg,FOXP3,Azimuth
+187,CD4+/CD25 T Reg,AC133644.2,Azimuth
+188,CD4+/CD25 T Reg,CD4,Azimuth
+189,CD4+/CD25 T Reg,IL2RA,Azimuth
+190,CD4+/CD25 T Reg,TIGIT,Azimuth
+191,CD4+/CD25 T Reg,CTLA4,Azimuth
+192,CD4+/CD25 T Reg,FCRL3,Azimuth
+193,CD4+/CD25 T Reg,LAIR2,Azimuth
+194,CD4+/CD25 T Reg,IKZF2,Azimuth
+195,CD4+/CD45RA+/CD25- Naive T,TCF7,Azimuth
+196,CD4+/CD45RA+/CD25- Naive T,CD4,Azimuth
+197,CD4+/CD45RA+/CD25- Naive T,CCR7,Azimuth
+198,CD4+/CD45RA+/CD25- Naive T,IL7R,Azimuth
+199,CD4+/CD45RA+/CD25- Naive T,FHIT,Azimuth
+200,CD4+/CD45RA+/CD25- Naive T,LEF1,Azimuth
+201,CD4+/CD45RA+/CD25- Naive T,MAL,Azimuth
+202,CD4+/CD45RA+/CD25- Naive T,NOSIP,Azimuth
+203,CD4+/CD45RA+/CD25- Naive T,LDHB,Azimuth
+204,CD4+/CD45RA+/CD25- Naive T,PIK3IP1,Azimuth
+205,CD8+/CD45RA+ Naive Cytotoxic,CD8B,Azimuth
+206,CD8+/CD45RA+ Naive Cytotoxic,S100B,Azimuth
+207,CD8+/CD45RA+ Naive Cytotoxic,CCR7,Azimuth
+208,CD8+/CD45RA+ Naive Cytotoxic,RGS10,Azimuth
+209,CD8+/CD45RA+ Naive Cytotoxic,NOSIP,Azimuth
+210,CD8+/CD45RA+ Naive Cytotoxic,LINC02446,Azimuth
+211,CD8+/CD45RA+ Naive Cytotoxic,LEF1,Azimuth
+212,CD8+/CD45RA+ Naive Cytotoxic,CRTAM,Azimuth
+213,CD8+/CD45RA+ Naive Cytotoxic,CD8A,Azimuth
+214,CD8+/CD45RA+ Naive Cytotoxic,OXNAD1,Azimuth
+215,CD8+ Cytotoxic T,CCL5,Azimuth
+216,CD8+ Cytotoxic T,GZMH,Azimuth
+217,CD8+ Cytotoxic T,CD8A,Azimuth
+218,CD8+ Cytotoxic T,TRAC,Azimuth
+219,CD8+ Cytotoxic T,KLRD1,Azimuth
+220,CD8+ Cytotoxic T,NKG7,Azimuth
+221,CD8+ Cytotoxic T,GZMK,Azimuth
+222,CD8+ Cytotoxic T,CST7,Azimuth
+223,CD8+ Cytotoxic T,CD8B,Azimuth
+224,CD8+ Cytotoxic T,TRGC2,Azimuth
+225,Dendritic,CD74,Azimuth
+226,Dendritic,HLA-DPA1,Azimuth
+227,Dendritic,HLA-DPB1,Azimuth
+228,Dendritic,HLA-DQA1,Azimuth
+229,Dendritic,CCDC88A,Azimuth
+230,Dendritic,HLA-DRA,Azimuth
+231,Dendritic,HLA-DMA,Azimuth
+232,Dendritic,CST3,Azimuth
+233,Dendritic,HLA-DQB1,Azimuth
+234,Dendritic,HLA-DRB1,Azimuth
+235,CD34+,SPINK2,Azimuth
+236,CD34+,PRSS57,Azimuth
+237,CD34+,CYTL1,Azimuth
+238,CD34+,EGFL7,Azimuth
+239,CD34+,GATA2,Azimuth
+240,CD34+,CD34,Azimuth
+241,CD34+,SMIM24,Azimuth
+242,CD34+,AVP,Azimuth
+243,CD34+,MYB,Azimuth
+244,CD34+,LAPTM4B,Azimuth
+245,CD4+/CD45RA+/CD25- Naive T,ID3,Zheng
+246,CD19+ B,CD79A,Zheng
+247,CD19+ B,CD19,Zheng
+248,CD19+ B,CLEC4C,Zheng
+249,CD8+ Cytotoxic T,CD8B,Zheng
+250,CD8+ Cytotoxic T,CD8A,Zheng
+251,CD8+ Cytotoxic T,CD3D,Zheng
+252,CD8+ Cytotoxic T,GZMK,Zheng
+253,CD8+ Cytotoxic T,ID3,Zheng
+254,CD4+/CD45RO+ Memory,CCR19,Zheng
+255,CD4+/CD45RO+ Memory,CCR10,Zheng
+256,CD4+/CD25 T Reg,TNFRSF18,Zheng
+257,CD4+/CD25 T Reg,ID3,Zheng
+258,CD14+ Monocyte,CD14,Zheng
+259,CD14+ Monocyte,FCN1,Zheng
+260,CD14+ Monocyte,LGALS3,Zheng
+261,CD14+ Monocyte,S100A8,Zheng
+262,CD14+ Monocyte,S100A9,Zheng
+263,CD14+ Monocyte,FTL,Zheng
+264,CD56+ NK,NKG7,Zheng
+265,CD56+ NK,GNLY,Zheng
+266,CD56+ NK,SIGLEC7,Zheng
+267,Dendritic,FCER1A,Zheng
+268,Dendritic,CLEC9A,Zheng
+269,CD34+,CD34,Zheng
+270,CD34+,GATA2,Zheng
+271,Granulocytes,AZU1,Zheng
+272,Granulocytes,IL8,Zheng
+273,Megakaryocytes,PTCRA,Zheng
+274,Megakaryocytes,PF4,Zheng
