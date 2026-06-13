@@ -17,10 +17,9 @@ Non conformity scores for regression/prediction
     - L1 score
 """
 import numpy as np
-from types import SimpleNamespace
-from  clim.utils.utils import match_labels
+from  .utils import match_labels
 
-def hinge_error(y_true, probs, proba=True):
+def hinge_error(y_true, probs):
     """ Hinge error from probability class 
             1 - P_h(y_i|x_i)
     y_true: true labels {0, ..., K-1}
@@ -32,13 +31,10 @@ def hinge_error(y_true, probs, proba=True):
     n = probs.shape[0]
     value = 1.0 - probs[np.arange(n), y_true]
 
-    return SimpleNamespace(
-        value=value,
-        proba=proba,
-        name="hinge_error")
+    return value
 
 
-def hamming_distance(y_true, y_pred, proba=False):
+def hamming_distance(y_true, y_pred):
     """ Hamming distance (see Lange)
             d(y_pred, y_true) = 1/n * sum_i 1(y_pred != y_true)
 
@@ -48,11 +44,7 @@ def hamming_distance(y_true, y_pred, proba=False):
     # realign
     y_preds_aligned = match_labels(y_preds, y_true)
     d = np.mean(1 * (y_preds_aligned!=y_true))
-    return SimpleNamespace(
-        value=d,
-        proba=proba,
-        name='hamming_distance'
-    )
+    return d
 
 def margin_error(y_true, probs, proba=True):
     """ Margin error from probability class
@@ -73,11 +65,7 @@ def margin_error(y_true, probs, proba=True):
 
     value = max_other - true_probs
 
-    return SimpleNamespace(
-        value=value,
-        proba=proba,
-        name="margin_error"
-    )
+    return value
 
 
 
@@ -93,12 +81,7 @@ def error_rate(y_true, y_pred_loo, y_pred_loco, proba=False):
     misclass = float((e_loco-e_loo).mean())
     var = float(np.var(e_loco-e_loo, ddof=1) / N)   # jackknife variance since loo preds
     std = float(np.sqrt(var))
-    return SimpleNamespace(
-        value=misclass,
-        std=std,
-        proba=proba,
-        name="loo_error"
-    )
+    return misclass, std
 
 
 def misclassification_error(y_true, y_pred, proba=False):
@@ -109,12 +92,7 @@ def misclassification_error(y_true, y_pred, proba=False):
     N = y_true.size
     misclass = (y_true != y_pred).astype(float).mean()
     std = (y_true != y_pred).astype(float).std()
-    return SimpleNamespace(
-        value=misclass,
-        std=std,
-        proba=proba,
-        name="misclassification_error"
-    )
+    return misclass, std
 
 def l1_error(y_true, preds, proba=False):
     """ |y_i - f_h(x_i)|
@@ -126,10 +104,7 @@ def l1_error(y_true, preds, proba=False):
 
     value = np.abs(y_true-preds)
     
-    return SimpleNamespace(
-        value=value,
-        proba=proba,
-        name="l1_error")
+    return value
 
 def l2_error(y_true, preds, proba=False):
     """ (y_i - f_h(x_i))
@@ -141,7 +116,4 @@ def l2_error(y_true, preds, proba=False):
 
     value = np.sqrt(np.mean((y_true-preds)**2))
     
-    return SimpleNamespace(
-        value=value,
-        proba=proba,
-        name="l2_error")
+    return value

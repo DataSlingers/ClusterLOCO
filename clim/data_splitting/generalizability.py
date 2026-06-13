@@ -1,21 +1,21 @@
-""" Split Cluster LOCO 
-
-Author: Claire He 
-
+""" Cluster LOCO Split
 
 Implements Split Cluster LOCO with given train/calibration sets for: 
 - negative ARI
 - non conformity scores in clim.non_conformity_scores 
 
 Version for reproducibility and experiments.
+Author: Claire He 
 """
-from sklearn.base import clone
 import numpy as np
+from joblib import Parallel, delayed
+
+from sklearn.base import clone
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
-from clim.utils.utils import *
-from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score
+
+from clim.utils.utils import *
 
 def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(), K=None, seed=24, error_metric=None,use_proba=True, n_jobs=-1):
     n_tr, p = X_tr.shape
@@ -24,12 +24,22 @@ def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(
     np.random.seed(seed)
     
     if K is not None:
-        try: 
-            model.set_params(n_clusters=K)
-            print(f"Reset n_clusters to {K}")
-        except ValueError:
-            print("Estimator does not have n_clusters, pre-specify cluster number with the right method before passing model")
-            pass
+        try:
+            params = model.get_params()
+    
+            if "n_clusters" not in params:
+                print(
+                    "Estimator does not have n_clusters; pre-specify cluster number "
+                    "with the right method before passing model"
+                )
+            elif params["n_clusters"] is None:
+                model.set_params(n_clusters=K)
+                print(f"Set n_clusters to {K}")
+            else:
+                print(f"n_clusters already set to {params['n_clusters']}; skipping reset")
+    
+        except AttributeError:
+            print("Estimator does not support get_params/set_params")
     
     train_model, test_model = clone(model), clone(model)
   
@@ -48,7 +58,6 @@ def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(
     # Fit classifier on training
     transfer_clf = clone(clf)
     transfer_clf.fit(X_tr, y_tr) 
-    # assert len(transfer_clf.classes_) == K, "need more samples, classes don't match cluster number" 
     
     # Compute error on calibration set 
     if hasattr(transfer_clf, "predict_proba"): # soft classifier
@@ -82,10 +91,6 @@ def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(
         cluster_std = np.std(errors_j - errors, axis=0)
 
     return cluster_loco, cluster_std
-    
-
-
-
     
 
 def compute_loco_error(X_tr, X_ca, model, K, error_metric, clf, feature, use_proba=True):

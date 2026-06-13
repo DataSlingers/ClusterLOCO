@@ -1,38 +1,32 @@
-"""" Author: Claire He
-
-
-
+"""" 
 Global feature importance score for clustering: Minipatched Stability scores
 
 - based on Ben-Hur stability 
 - based on consensus-clustering derived stability (IMPACC based on Gan et al.)
 
+Author: Claire He
 """
-from clim.minipatches.minipatch import get_minipatch, adaptive_minipatch
-from clim.utils.utils import match_labels
-import pandas as pd
-from collections import Counter
 import numpy as np
-from sklearn.metrics import adjusted_rand_score, silhouette_score
+import pandas as pd
+from itertools import combinations
+from collections import Counter
+import tqdm
+
+from sklearn.base import clone
+from sklearn.metrics import adjusted_rand_score, silhouette_score, accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn import datasets
-from sklearn.cluster import KMeans
-from scipy.spatial.distance import pdist, squareform
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.base import clone
-from itertools import combinations
-from sklearn.metrics import confusion_matrix
-from scipy.optimize import linear_sum_assignment
-import scipy as sc
-from scipy.spatial.distance import squareform
-import tqdm
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.neighbors import kneighbors_graph
-from scipy.cluster.hierarchy import fcluster, linkage
 from sklearn.feature_selection import f_classif
-from sklearn.cluster import AgglomerativeClustering
+
+import scipy as sc
+from scipy.spatial.distance import pdist, squareform
+from scipy.optimize import linear_sum_assignment
+from scipy.cluster.hierarchy import fcluster, linkage
+
+from .minipatch import get_minipatch, adaptive_minipatch
+from clim.utils import match_labels
 
 def intersect1d(array1, array2):
     # efficient using sets but only returns the elements in intersection not the positions

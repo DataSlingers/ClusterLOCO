@@ -1,4 +1,6 @@
-""" Cluster LOCO MP 
+""" Cluster LOCO-MP 
+
+Main Cluster LOCO-MP code base for LOCO feature importance with clustering generalizability via fast minipatch ensembles
 
 Author: Claire He 
 Last modification: 12/06/2026
@@ -21,7 +23,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.metrics import adjusted_rand_score
 
 from clim.utils.utils import hungarian_align, _set_if_exists, _resolve_patch_param, _label_mapping_from_overlap, _apply_label_mapping
-from clim.minipatches.minipatch import iter_minipatches
+from .minipatch import iter_minipatches
 
 
 class ClusterLOCOMP:

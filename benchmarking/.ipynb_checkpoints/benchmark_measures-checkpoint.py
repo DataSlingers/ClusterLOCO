@@ -22,32 +22,36 @@ LOCO-style score:
 Author: Claire HE 
 """
 import numpy as np
-from benchmarking.neuralized_kmeans import *
-from benchmarking.prototypes import *
-from sklearn.base import clone
 from itertools import combinations
+from math import comb
+from joblib import Parallel, delayed
+import tqdm
+from numpy.random import SeedSequence 
+
+from sklearn.base import clone
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
-import scipy.special as sc
 from sklearn.linear_model import LinearRegression
-from itertools import combinations
-from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, silhouette_score,accuracy_score,confusion_matrix
-from math import comb
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import kneighbors_graph
+
+import scipy.special as sc
 from scipy.spatial.distance import pdist, squareform
 from scipy.optimize import linear_sum_assignment
-import tqdm
-from sklearn.neighbors import kneighbors_graph
+
+from .neuralized_kmeans import *
+from .prototypes import *
 import sys
 sys.path.append("../")
 from clim.utils.model_selection import *
 from clim.utils.utils import *
 
-
-
 class Fuzzy_CSHAP_explainer:
+    """ 
+    Based on the description of FCM Cluster explainer by Napoles 
+    """
     def __init__(self, X, K, model=None, baseline="mean", X_reference=None, random_state=None):
         X = np.asarray(X, dtype=float)
         if X.ndim != 2:
@@ -239,6 +243,17 @@ def _local_phi_worker(x, explainer, cluster_idx, method, M):
     return np.abs(phi)
     
 class c_SHAP:
+    """ 
+    Based on the description of FCM Cluster explainer by Napoles 
+
+    Supports different SHAP computations based on SHAP paper:
+        if method is 'perm', uses permutation Shapley approxmation, 
+        if method is 'exact', uses exact Shapley computation (only use 
+        for small number of features)
+        if method is 'kernel', uses KernelSHAP approximation
+    - get_global_importance returns global cluster-wise importance 
+    - get_model_wide_importance returns global model importance 
+    """
     def __init__(self, X, K, model=None, method='perm', M=100, n_jobs=8,
                  X_reference=None, random_state=None, baseline='zero'):
         self.X = np.asarray(X, dtype=float)
@@ -419,9 +434,24 @@ def perm_misclass_rate(cluster_obj, X, var_name, base_pred=None, pred_fn = None,
     return mcr
 
 
-from numpy.random import SeedSequence 
-
 def feature_imp_cluster(cluster_obj, X, base_pred = None, pred_fn =None, biter=10, seed=123):
+    """ 
+    Based on Montavon, Kauffmann neuralized K-means (NEON)
+    Needs to use a Kmeans as surrogate.
+
+    Parameters
+    ----------
+    X: ndarray, shape (n, d)
+        data
+    K: int
+        number of clusters to fit
+    random_state: int
+        for reproducibility
+        
+    Returns
+    ----------
+    Feature-averaged relevance scores, shape (d, )
+    """    
     import pandas as pd
 
     if isinstance(X, pd.DataFrame):
@@ -433,7 +463,7 @@ def feature_imp_cluster(cluster_obj, X, base_pred = None, pred_fn =None, biter=1
         vars_ = [f"x{j}" for j in range(X_master.shape[1])]
         use_names = False
 
-    # baseline predictions once (saves time)
+    # baseline predictions once 
     if pred_fn is None:
         if hasattr(cluster_obj, "predict"):
             pred_fn_use = lambda obj, newdata: obj.predict(newdata)
@@ -454,8 +484,6 @@ def feature_imp_cluster(cluster_obj, X, base_pred = None, pred_fn =None, biter=1
     mis_mat = np.zeros((biter, len(vars_)), dtype=float)
 
     for j, name in enumerate(vars_):
-        # We call our R-style perm_misclass_rate
-        # Note: We pass the clean X_master; the sub-function handles copying.
         mis = perm_misclass_rate(
             cluster_obj=cluster_obj,
             X=X_master,

@@ -1,5 +1,5 @@
 """
-Code base for model selection toolsets including data splitting, 
+Code base for model selection toolsets including data splitting, k-fold cv and subsampling
 
 Author: Claire He
 
@@ -7,8 +7,6 @@ Author: Claire He
 - k_fold_split: base function for k_fold data splitting. When k=n-1 LOO-split
 - subsample : multiple random train/test splits 
 """
-
-
 import numpy as np
 from sklearn.base import clone
 
@@ -122,8 +120,3 @@ def subsample(X, ratio=0.8, shuffle=True, random_state=None, ind=False):
     
     return (X_train, train_idx) 
     
-##  Usage example
-# splits = data_split(X, method='k_fold', n_split=2, ratio=0.8, ind=True, seed=None)
-# for i in range(len(splits)):
-#     X, idx = splits[i][0], splits[i][1]
-#     model.fit(X)

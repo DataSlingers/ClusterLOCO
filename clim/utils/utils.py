@@ -5,13 +5,32 @@ from scipy.spatial.distance import cdist
 import seaborn as sns
 from scipy.sparse import csr_array
 
+def transform_scores_to_ranking(scores: np.ndarray):
+    """
+    Given a 1D array of scores (higher = better), produce:
+      - tau: indices sorted by descending score (permutation)
+      - ranks: 1-based ranks aligned to original indices (ties broken by stable order)
+    """
+    scores = np.asarray(scores).astype(float)
+    # Sort descending; stable to preserve input order on ties
+    tau = np.argsort(-scores, kind='mergesort')
+    ranks = np.empty_like(tau)
+    ranks[tau] = np.arange(0, len(scores))
+    return tau, ranks
+
 def _set_if_exists(estimator, **kwargs):
+    """
+    Checks if parameters exists for the estimator, if they do, reset arguments from passed kwargs
+    """
     params = estimator.get_params()
     valid = {k: v for k, v in kwargs.items() if k in params}
     if valid:
         estimator.set_params(**valid)
         
 def _resolve_patch_param(alpha, patch_size, total, alpha_name, size_name):
+    """
+    Resolves patch_size issues, prioritize explicit minipatch size patch_size vs minipatch ratio alpha
+    """
     if patch_size is not None:
         if not isinstance(patch_size, int):
             raise TypeError(f"{size_name} must be int, got {type(patch_size).__name__}")
@@ -84,6 +103,10 @@ def standardize_cols(X: np.ndarray) -> np.ndarray:
 
 
 def match_labels(y_true, y_pred,return_map=False):
+    """
+    Hungarian alignment algorithm between true and prediction.
+    This version is slower than label_alignment but supports generalized linear sum assignment ie even when label sets might differ. 
+    """
     if len(y_true)==len(y_pred):
         D = confusion_matrix(y_true, y_pred)
         row_ind, col_ind = linear_sum_assignment(D.max() - D)

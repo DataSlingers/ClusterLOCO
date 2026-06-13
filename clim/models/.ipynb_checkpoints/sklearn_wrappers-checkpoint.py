@@ -8,24 +8,25 @@ Sklearn wrappers for alternative clustering algorithms
 - SpectralClusteringAffinity: supports different affinity transformations
 - Gamma Mixture (to double check, generated with GPT)
 """
-from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.decomposition import PCA, SparsePCA
 import numpy as np
-from sklearn.decomposition import TruncatedSVD
-import leidenalg 
+from numpy.linalg import eigh
+
+from sklearn.base import BaseEstimator, ClusterMixin
+from sklearn.decomposition import PCA, SparsePCA, TruncatedSVD
 from sklearn.neighbors import kneighbors_graph, NearestNeighbors
-import igraph as ig
-from scipy.sparse import coo_matrix
 from sklearn.cluster import SpectralClustering, KMeans
 from sklearn.metrics import pairwise_distances
-import scipy.sparse as sp
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array
 from sklearn.exceptions import NotFittedError
+
+from scipy.sparse import coo_matrix
+import scipy.sparse as sp
 from scipy.sparse.linalg import eigsh
 from scipy.linalg import eigh as geigh
-from numpy.linalg import eigh
 from scipy.special import gammaln, digamma, polygamma, logsumexp
-from sklearn.utils.validation import check_array, check_is_fitted
+
+import leidenalg 
+import igraph as ig
 
 class Leiden(BaseEstimator, ClusterMixin):
     def __init__(self, n_neighbors=10, resolution=0.6, pc_comp=None):
@@ -66,7 +67,6 @@ class Leiden(BaseEstimator, ClusterMixin):
         for key, value in params.items():
             setattr(self, key, value)
         return self
-
 
     
 class BaseSpectralClustering(BaseEstimator, ClusterMixin):

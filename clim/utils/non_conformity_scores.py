@@ -17,7 +17,7 @@ Non conformity scores for regression/prediction
     - L1 score
 """
 import numpy as np
-from  clim.utils.utils import match_labels
+from  .utils import match_labels
 
 def hinge_error(y_true, probs):
     """ Hinge error from probability class 
