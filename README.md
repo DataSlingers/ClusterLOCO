@@ -6,22 +6,21 @@ Cluster LOCO is a model-agnostic framework for quantifying feature importance in
 ## Installation
 
 Clone the repository and install the package in editable mode:
-```
+```bash
 git clone https://github.com/DataSlingers/ClusterLOCO.git
 cd ClusterLOCO
 pip install -e .
 ```
 
 For experiment dependencies, such as anndata and scanpy, install:
-```
+```bash
 pip install -e ".[experiments]"
 ```
 
-###  Requirements
+### Requirements
 
-The core package requires Python 3.10 or higher.
-Core dependencies include:
-```
+The core package requires Python 3.10 or higher. Core dependencies include:
+```bash
 numpy
 scipy
 pandas
@@ -34,7 +33,7 @@ leidenalg
 igraph
 ```
 Optional experiment dependencies include:
-```
+```bash
 anndata
 scanpy
 ```
@@ -45,12 +44,12 @@ The package offers Cluster LOCO via data splitting, via minipatches and with ada
 
 ### Cluster LOCO Split 
 Cluster LOCO Split is recommended for data with *few features* (less than 10 features). 
-```{python}
+```python
 from clim.data_splitting import Cluster_LOCO_Split
 from clim.utils import hinge_error
 ```
 **Basic usage**: for any `sklearn` clustering algorithm, default transfer classifier is `RandomForestClassifier`. 
-```{python}
+```python
 from sklearn.cluster import SpectralClustering
 model = SpectralClustering(n_clusters=K) 
 feature_importance, feature_importance_se = Cluster_LOCO_Split(X_train, X_test, model=model, error_metric=hinge_error, use_proba=True, seed=42)
@@ -59,11 +58,11 @@ feature_importance, feature_importance_se = Cluster_LOCO_Split(X_train, X_test, 
 ### Cluster LOCO-MP
 Cluster LOCO-MP implements a minipatch ensemble version of Cluster LOCO. This approach is suited for large data. 
 
-```{python}
+```python
 from clim import ClusterLOCOMP
 ```
 **Basic usage**: for any `sklearn` clustering algorithm, first `fit()` the minipatch model, then compute the feature importance via `score()`. We recommend to use parallelization during model fitting but **not** during computing scores where the overhead can be consequential. 
-```{python}
+```python
 g = ClusterLOCOMP(base_clusterer = model, base_classifier = RandomForestClassifier(), K=3, B=500)
 g.fit(X, standardize=False, alpha_N = 0.2, alpha_M = 0.2, parallel=par)
 out = g.score(error_metric=hinge_error, agg='mean', proba_error=True, parallel_features=False) 
@@ -71,17 +70,17 @@ out = g.score(error_metric=hinge_error, agg='mean', proba_error=True, parallel_f
 
 ### Cluster LOCO-RAMPART
 Cluster LOCO-RAMPART is a sped-up version of Cluster LOCO-MP based on adaptive recursive trimming of active feature set. We recommend using this with high-dimensional data. 
-```{python}
+```python
 from clim import ClusterLOCO_RAMPART, RAMPART
 from clim.utils import transform_scores_to_ranking
 ```
 **Basic usage**:
-```{python}
+```python
 from clim import ClusterLOCO_RAMPART, RAMPART
 from clim.utils import transform_scores_to_ranking
 ```
-
-```{python}
+`RAMPART` directly fits the model and computes the scores. 
+```python
 gen_fn = ClusterLOCO_RAMPART(base_clusterer=model, K=3, error_metric=hinge_error, parallel_MP=True,
     parallel={"n_jobs_features": 3, "backend": "loky", "prefer": "processes", "verbose": 0}, 
     standardize=False, alpha_N = 0.2, alpha_M = 0.2)
@@ -92,17 +91,17 @@ out = RAMPART(X, generalizability_fn=gen_fn, B=1000, ranking_fn=transform_scores
 *Development install*
 
 To install locally while developing:
-```
+```bash
 pip install -e .
 ```
 To check that the package is correctly installed:
-```
+```bash
 python -c "import clim; print(clim.__file__)"
 python -c "from clim import ClusterLOCOMP; print('import ok')"
 ```
 
 To build the package:
-```
+```bash
 python -m pip install build
 python -m build
 ```
@@ -113,11 +112,11 @@ This should create a source distribution and wheel in the dist/directory.
 The package keeps experiment dependencies separate from the core installation. This avoids requiring single-cell analysis packages for users who only want the core Cluster LOCO methods.
 
 Install experiment dependencies with:
-```
+```bash
 pip install -e ".[experiments]"
 ```
 This installs additional packages such as:
-```
+```bash
 anndata
 scanpy
 ```
