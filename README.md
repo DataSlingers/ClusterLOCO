@@ -70,10 +70,7 @@ out = g.score(error_metric=hinge_error, agg='mean', proba_error=True, parallel_f
 
 ### Cluster LOCO-RAMPART
 Cluster LOCO-RAMPART is a sped-up version of Cluster LOCO-MP based on adaptive recursive trimming of active feature set. We recommend using this with high-dimensional data. 
-```python
-from clim import ClusterLOCO_RAMPART, RAMPART
-from clim.utils import transform_scores_to_ranking
-```
+
 **Basic usage**:
 ```python
 from clim import ClusterLOCO_RAMPART, RAMPART
