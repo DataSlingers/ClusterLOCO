@@ -141,9 +141,10 @@ This repository additionally contains code to reproduce the results from our pap
 
 If you use this package, please cite the corresponding Cluster LOCO paper.
 ```
-@article{he2026clusterloco,
+@preprint{he2026clusterloco,
   title={Cluster LOCO: Feature Importance for Interpreting Clusters},
   author={He, Claire and Allen, Genevera},
+  url={https://arxiv.org/pdf/2606.14592},
   year={2026}
 }
 ```
