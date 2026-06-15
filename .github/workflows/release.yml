@@ -52,7 +52,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/project/clim/
+      url: https://pypi.org/project/clusterloco/
 
     steps:
       - name: Retrieve release distributions
