@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/DataSlingers/ClusterLOCO/actions/workflows/release.yml/badge.svg)](https://github.com/DataSlingers/ClusterLOCO/actions/workflows/release.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![PyPI](https://img.shields.io/pypi/v/clusterloco.svg)](https://pypi.org/project/clusterloco/0.1.0/)
+[![PyPI](https://img.shields.io/pypi/v/clusterloco.svg?cacheSeconds=60)](https://pypi.org/project/clusterloco/)
+
 # Cluster LOCO: Feature Importance for Interpreting Clusters
 
 `clusterloco` is a Python package for Cluster LOCO feature importance methods for clustering interpretability.
