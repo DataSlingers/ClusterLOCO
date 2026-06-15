@@ -2,21 +2,44 @@
 
 [![CI](https://github.com/DataSlingers/ClusterLOCO/actions/workflows/release.yml/badge.svg)](https://github.com/DataSlingers/ClusterLOCO/actions/workflows/release.yml)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
-[![PyPI version](https://badge.fury.io/py/clim.svg)](https://badge.fury.io/py/clim)
+[![PyPI version](https://badge.fury.io/py/clusterloco.svg)](https://badge.fury.io/py/clusterloco)
 
 # Cluster LOCO: Feature Importance for Interpreting Clusters
 
-`clim` is a Python package for Cluster LOCO feature importance methods for clustering interpretability.
+`clusterloco` is a Python package for Cluster LOCO feature importance methods for clustering interpretability.
 Cluster LOCO is a model-agnostic framework for quantifying feature importance in clustering. The package provides methods that evaluate how much removing a feature affects the generalizability and stability of a clustering solution, enabling feature-level interpretation for unsupervised learning workflows.
 
 ## Installation
 
+### Package
+Our package can be installed directly from PyPI:
+```bash
+pip install clusterloco
+```
+or for additional experiment dependencies, use
+```bash
+pip install "clusterloco[experiments]"
+```
+### Development installation
 Clone the repository and install the package in editable mode:
 ```bash
 git clone https://github.com/DataSlingers/ClusterLOCO.git
 cd ClusterLOCO
 pip install -e .
 ```
+To check that the package is correctly installed:
+```bash
+python -c "import clim; print(clim.__file__)"
+python -c "from clim import ClusterLOCOMP; print('import ok')"
+```
+
+To build the package:
+```bash
+python -m pip install build
+python -m build
+```
+This should create a source distribution and wheel in the dist/directory.
+
 
 For experiment dependencies, such as anndata and scanpy, install:
 ```bash
@@ -90,39 +113,6 @@ gen_fn = ClusterLOCO_RAMPART(base_clusterer=model, K=3, error_metric=hinge_error
 out = RAMPART(X, generalizability_fn=gen_fn, B=1000, ranking_fn=transform_scores_to_ranking, top_k=50)
 ```
 
-## Other 
-*Development install*
-
-To install locally while developing:
-```bash
-pip install -e .
-```
-To check that the package is correctly installed:
-```bash
-python -c "import clim; print(clim.__file__)"
-python -c "from clim import ClusterLOCOMP; print('import ok')"
-```
-
-To build the package:
-```bash
-python -m pip install build
-python -m build
-```
-This should create a source distribution and wheel in the dist/directory.
-
-*Optional experiment dependencies*:
-
-The package keeps experiment dependencies separate from the core installation. This avoids requiring single-cell analysis packages for users who only want the core Cluster LOCO methods.
-
-Install experiment dependencies with:
-```bash
-pip install -e ".[experiments]"
-```
-This installs additional packages such as:
-```bash
-anndata
-scanpy
-```
 
 ### Package structure
 ```
@@ -154,6 +144,3 @@ If you use this package, please cite the corresponding Cluster LOCO paper.
   year={2026}
 }
 ```
-## License
-
-MIT License
