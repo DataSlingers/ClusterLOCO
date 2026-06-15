@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "clim"
-version = "0.1.2"
+name = "clusterloco"
+version = "0.1.0"
 description = "Cluster LOCO feature importance methods for clustering interpretability"
 readme = "README.md"
 requires-python = ">=3.10"
