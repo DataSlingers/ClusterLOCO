@@ -16,13 +16,50 @@ from scipy.stats import chi2
 from scipy.stats import norm, gamma as gamma_dist
 
 def permute_feature(X, j, rng=None):
+    """
+    Return a row-permuted feature
+    
+    Parameters
+    ----------
+    X : (N, M) array
+        data 
+    j : int between [0, M[
+        index of feature to permute
+    Return
+    ------
+    Xj : (N, ) new feature based on X[:,j] with permuted rows
+    """
     rng = np.random.default_rng() if rng is None else rng
     Xp = X.copy()
     Xp[:, j] = rng.permutation(Xp[:, j])
     return Xp[:,j]
     
 def project_HD(d, noise_d, samples_to_project, labels, noise_type='gaussian', random_state=42, Z_dict=False):
-    """ Linearly project in HD using orthonormal projection """
+    """ Linearly project in HD using orthonormal projection 
+    
+    Parameters
+    ----------
+
+    
+    d : int
+        Target signal dimension
+    noise_d : int
+        Noise signal dimension
+    samples_to_project : (N, r) array
+        Latent samples to project.
+    labels : (N,) array-like
+        Cluster labels for each sample. Determines which Z_k to use.
+    noise_type : {'gaussian','gamma', None}
+        Type of noise appended in the last noise_d dims.
+    rng : np.random.Generator or None
+        Random generator; if None, a default is created.
+    Z_dict : boolean
+        Return projection matrix Z (N, r)
+        
+    Return
+    ------
+    X, labels, (Z if Z_dict) 
+    """
     rng = np.random.RandomState(random_state)
     N, r = samples_to_project.shape
     # cluster assignment O-H encoded
@@ -155,6 +192,16 @@ def _circle_overlap_area(d, r1, r2):
     """
     Exact area of overlap between two circles of radii r1, r2 with center distance d.
     Returns 0 if disjoint, min(area) if one contains the other, else lens area.
+
+    Parameters
+    ----------
+    d: float 
+        center distance 
+    r1, r2: floats
+        radius of each circle
+    Returns
+    -------
+    area overlap
     """
     # Disjoint
     if d >= r1 + r2:
@@ -170,13 +217,8 @@ def _circle_overlap_area(d, r1, r2):
     area2 = 0.5 * r2_2 * (beta  - np.sin(beta))
     return area1 + area2
 
-def random_circles(
-    n_samples=1000,
-    n_clusters=4,
-    radii=None,                 # list/array of length K or None (random)
-    half_circle_prob=0.5,
-    noise=0.05,
-    max_overlap_pct=5.0,        # p% cap on pairwise overlap (treat half-moon as full circle)
+def random_circles(n_samples=1000, n_clusters=4, radii=None,                 # list/array of length K or None (random)
+    half_circle_prob=0.5, noise=0.05, max_overlap_pct=5.0,        # p% cap on pairwise overlap (treat half-moon as full circle)
     bbox=(-6, 6, -6, 6),        # (xmin, xmax, ymin, ymax) placement region
     centers=None,               # optional preset centers (overrides placement if given)
     max_place_tries=10_000,     # global tries to place all centers
@@ -187,8 +229,35 @@ def random_circles(
     """
     Generate K clusters in 2D: each is either a full circle or a half-circle with random orientation.
     Enforces that for any pair (i,j), circle overlap area ≤ (max_overlap_pct/100) * min(area_i, area_j).
+    Overlap is computed using the FULL circles even for half-circles.
 
-    Overlap is computed using the FULL circles even for half-circles (your rule).
+    Parameters
+    ----------
+    n_samples: int
+        total number of samples
+    n_clusters: int
+        number of clusters generated
+    radii: (K, ) array or None (default)
+        list of radius for the K random circles 
+    half_circle_prob: p in (0, 1)
+        probability of generating a half circle vs full circle 
+    noise: float, default 0.05
+        noise added to the circles
+    max_overlap_pct: in (0, 100), default 5.0 
+        percentage cap on pairwise overlap of circles 
+    bbox: default (-6, 6, -6, 6)
+        placement region of 2D circles (xmin, xmax, ymin, ymax) 
+    centers: (K, 2) default None
+        optional centers for clusters
+    max_place_tries, per_center_tries: 
+        max tries to place all centers, max tries per center
+    rng: 
+        Random generator
+    diag:
+        if True, returns diagnostics
+    Returns
+    ------
+    data, labels, (diagnostics if diag is True)
     """
     if rng is None:
         rng = np.random.default_rng()
@@ -556,10 +625,58 @@ def random_polynomial_features(X, embed_dim, degree, rng = None, include_linear=
 
 
 class BaseSimulator:
-    def __init__(self, K, n_samples_per_cluster, alpha=1.0, d_0=4, Cov_k=None, method='gaussian', center_method='random', random_state=None, mode='original', gaps=None, r=None, balanced=True, oversample=2.0, per_cluster_seed=True, shape_probs=None):
+    def __init__(self, K, n_samples_per_cluster, alpha=1.0, d_0=4, Cov_k=None, method='gaussian', center_method='random', random_state=None, mode='original', gaps=None, r=None, oversample=2.0, per_cluster_seed=True, shape_probs=None):
         """
-        Simulator class for cluster data. 
+        Main data simulator class for clustering data. 
 
+        Parameters
+        ----------
+        K: int
+            number of clusters
+        n_samples_per_cluster: int or (K, )
+            number of samples per cluster
+        alpha: float, default 1.0
+            SNR dial, controls separation between centers in GMM for example
+        d_0: int, default 4.0
+            intrinsic dimension of generated signal
+        Cov_k: (K, d_0, d_0), default None
+            if specify covariance matrices per cluster
+        method: str, default 'gaussian'
+            method to simulate data among 'gaussian', 'gamma', 'moon-donut','low-rank-gaussian','swiss-roll'
+        center_method: str, default 'random'
+            method to place centers of clusters, takes 'random' or defaults to d_0-1 simplex if None
+        random_state:
+            seed for random generator
+        mode: 'original'
+            center placement for 'low-rank-gaussian' 
+        gaps: (K, ) array, default is None
+            controls gap between mask and circles (thickness of retained half moons and donut rings)
+        r: int, default is None
+            dimension for low-dimensional embedding of signal in low-rank-gaussian 
+        oversample: float, default 2.0
+            controls the amount of oversampling allowed after masking generated observations to approximate n_samples_per_cluster
+        per_cluster_seed: boolean, default True
+            set seed per cluster
+        shape_probs: (K, ) default is None
+            probability of generating half moon or donut 
+
+        Usage 
+        -----
+        # call covariance first for GMM example 
+        Cov_k = [GenerateCovariances(dim=d0, covMethod='onion', eta=1/(k+1)).covGen()[0] for k in range(K)]
+
+        sim = BaseSimulator(K=K, n_samples_per_cluster=n_per_cluster, alpha=alpha, d_0=d0,
+            method=sim_method, gaps=gaps, shape_probs=shape_probs, oversample=oversample, random_state=sim_seed)
+        X, y = sim.generate_data() # generated data is (K*n_samples_per_cluster, d_0), (K*n_samples_per_cluster,)
+
+        # if needing to project to higher dimension
+        sim.project_higher_dim(embed_dim=d - d0, method='orthogonal') # (N, d) dimensional data using orthogonal projection 
+
+        # if needing to append noise features
+        nt = 'uniform' 
+        sim.add_noise(noise_d=d, noise_type=nt, low=np.min(sim.X), high=np.max(sim.X))
+        X_with_noise = sim.X
+        
         """
         self.K = int(K)
         self.alpha = float(alpha)
@@ -584,7 +701,6 @@ class BaseSimulator:
                 raise ValueError("n_samples_per_cluster must be int or shape (K,)")
             self.nk = nk
 
-        self.balanced = bool(balanced)
         self.oversample = float(oversample)
         self.random_state = random_state
         self.rng = np.random.default_rng(random_state)
@@ -628,6 +744,9 @@ class BaseSimulator:
         
     # ---------- centers ----------
     def cluster_gen(self, center_method=None):
+        """
+        Generate cluster center using random normal sampling or via simplex centroid as described in Joe et al.
+        """
         if center_method is None:
             C0 = self._generate_simplex_centroids(self.K, self.d_0)  # unit-scale
         elif center_method == 'random':
@@ -674,18 +793,17 @@ class BaseSimulator:
     
         return self.alpha * cluster_centers
 
+    # ---------- fast sampling of useful distributions ----------
     def _sample_gamma_cluster(self, k, n, rng):
         scale = self.scale[k]
         shape = self.shape
         return rng.gamma(shape, scale, size=(n, self.d_0))
         
-
-    # ---------- fast gaussian sampling ----------
     def _sample_gaussian_cluster(self, k, n, rng):
         Z = rng.standard_normal((n, self.d_0))
         return (self.alpha * self.cluster_centers[k]) + Z @ self.L_k[k].T
 
-    # ---------- shape masks ----------
+    # ---------- Moon and donut helpers ----------
     def _intrinsic_chol(self, k):
         # Cholesky of intrinsic covariance (d0 x d0)
         idx = slice(0, self.d_0)
@@ -711,7 +829,7 @@ class BaseSimulator:
         Creates a crescent ("moon") by cutting a bite out of the outer disk.
     
         If u is provided, it is used as the bite direction in whitened space.
-        If u is None, a random direction is sampled (original behavior).
+        If u is None, a random direction is sampled.
         """
         idx = slice(0, self.d_0)
         L0 = self._intrinsic_chol(k)
@@ -769,8 +887,8 @@ class BaseSimulator:
         self.cluster_centers[0] = mid - 0.5 * target_sep * v
         self.cluster_centers[1] = mid + 0.5 * target_sep * v
     
-    # ---------- oversample-until-enough ----------
     def _sample_shaped_cluster_exact(self, k, n_target, shape, rng, q=0.95):
+        # oversample-until-enough
         center = self.alpha * self.cluster_centers[k]
         g = float(self.gaps[k]) if self.gaps is not None else 0.5
     
@@ -782,14 +900,7 @@ class BaseSimulator:
         u = None
         if shape == "moon" and hasattr(self, "_moon_u") and k in self._moon_u:
             u = self._moon_u[k]
-            
-        # if shape == "moon":
-            # u = np.zeros(self.d_0)
-            # u[0] = 1.0
-            # if self.K == 2:
-            #     if k == 1:
-            #         u = -u  # flip direction for the second moon
-        
+
         while n_need > 0:
             Xb = self._sample_gaussian_cluster(k, batch, rng)
     
@@ -869,6 +980,11 @@ class BaseSimulator:
         self.cluster_centers = Theta
 
     def generate_data(self, **kwargs):
+        """ 
+        Main data generating function
+        
+        supports 'gaussian', 'low-rank-gaussian', 'moon-donut','gamma' and 'swiss-roll'
+        """
         if self.method in ("gaussian", "moon-donut", 'gamma'):
             self.cluster_gen(self.center_method)
             Xs = []
@@ -959,6 +1075,7 @@ class BaseSimulator:
         self.X = np.concatenate([self.X, X_noise], axis=1)
         return self.X
 
+    # --------- other helpers -------------
     def _build_phi_psi_(self, nk, d_0, K, rng):
         d = d_0//2
         prop = rng.choice([0, 1], size=d-1)
@@ -999,17 +1116,8 @@ class BaseSimulator:
         X = np.concatenate([x, y, psi.reshape(-1, 1)], axis=1)
         return X
         
-    def project_higher_dim(
-        self,
-        embed_dim,
-        method="orthogonal",
-        degree=3,
-        gamma=0.5,
-        weight_scale=1.0,
-        activation="relu",
-        label_aware=True,
-        **kwargs,
-    ):
+    def project_higher_dim(self, embed_dim, method="orthogonal", degree=3, gamma=0.5,
+        weight_scale=1.0, activation="relu", label_aware=True, **kwargs,):
         """
         If label_aware=True, applies a cluster-specific random feature map per label.
         Requires self.labels to be set (call generate_data() first).
@@ -1234,58 +1342,4 @@ def _orthogonal_unit(vhat, rng):
     w = rng.standard_normal(d0)
     w = w - np.dot(w, vhat) * vhat
     return _unit(w)
-
-def _set_pairwise_interlocking(self, sep_frac=0.35, lift_frac=0.50, q=0.95,
-                               sep_jitter=0.10, lift_jitter=0.10):
-    """
-    Pair closest centers, then for each pair:
-      - enforce separation ~ sep_frac * r_out along vhat
-      - enforce perpendicular offset ~ lift_frac * r_out along what
-      - store opposite bite directions u along vhat
-
-    This produces 'S'-style interlocking rather than just facing crescents.
-    """
-    C = np.asarray(self.cluster_centers, dtype=float).copy()
-    K, d0 = C.shape
-
-    pairs, leftover = _pair_centers_greedy(C)
-
-    r_out = float(np.sqrt(chi2.ppf(q, df=self.d_0)))
-    base_sep  = float(sep_frac)  * r_out
-    base_lift = float(lift_frac) * r_out
-
-    rng = self.rng
-    moon_u = {}
-    pair_of = {}
-
-    for (i, j) in pairs:
-        ci, cj = C[i].copy(), C[j].copy()
-        v = cj - ci
-        if np.linalg.norm(v) < 1e-12:
-            v = np.zeros(d0); v[0] = 1.0
-
-        vhat = _unit(v)
-        what = _orthogonal_unit(vhat, rng)
-
-        # jittered magnitudes
-        sep  = base_sep  * rng.uniform(1 - sep_jitter,  1 + sep_jitter)
-        lift = base_lift * rng.uniform(1 - lift_jitter, 1 + lift_jitter)
-
-        mid = 0.5 * (ci + cj)
-
-        # --- KEY: add perpendicular offset (lift) so moons interlock ---
-        C[i] = mid - 0.5 * sep * vhat - 0.5 * lift * what
-        C[j] = mid + 0.5 * sep * vhat + 0.5 * lift * what
-
-        # opposite bite directions along vhat
-        moon_u[i] = +vhat
-        moon_u[j] = -vhat
-        pair_of[i] = j
-        pair_of[j] = i
-
-    self.cluster_centers = C
-    self._moon_u = moon_u
-    self._moon_pair_of = pair_of
-    self._moon_leftover = leftover
-
     
