@@ -188,8 +188,12 @@ def align_labels_confusion(y_true, y_pred, return_map=False):
     pred_labels = np.unique(y_pred)
 
     # confusion matrix with explicit label order
-    C = confusion_matrix(y_true, y_pred, labels=true_labels)
+    true_labels, true_inverse = np.unique(y_true, return_inverse=True)
+    pred_labels, pred_inverse = np.unique(y_pred, return_inverse=True)
 
+    C = np.zeros((len(true_labels), len(pred_labels)), dtype=np.int64)
+    np.add.at(C, (true_inverse, pred_inverse), 1)
+    
     # If label sets differ in size, pad to square for Hungarian assignment
     n_true, n_pred = C.shape
     n = max(n_true, n_pred)

@@ -5,8 +5,8 @@ Author: Claire He
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from clim.cluster_generation import generate_dataset
-from clim.sklearn_wrappers import Leiden, SpectralClusteringAffinity
+
+from clim.models.sklearn_wrappers import Leiden, SpectralClusteringAffinity
 from clim.utils import match_labels
 from benchmarking.benchmark_measures import *
 from benchmarking.neuralized_kmeans import *

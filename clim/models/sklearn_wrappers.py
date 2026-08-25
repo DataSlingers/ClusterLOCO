@@ -60,15 +60,6 @@ class Leiden(BaseEstimator, ClusterMixin):
     def fit_predict(self, X, y=None):
         return self.fit(X).labels_
 
-    def get_params(self, deep=True):
-        return {"n_neighbors": self.n_neighbors, "resolution": self.resolution}
-
-    def set_params(self, **params):
-        for key, value in params.items():
-            setattr(self, key, value)
-        return self
-
-    
 class BaseSpectralClustering(BaseEstimator, ClusterMixin):
     """ Base Spectral Clustering algorithm: 
 
@@ -79,7 +70,7 @@ class BaseSpectralClustering(BaseEstimator, ClusterMixin):
     """
     def __init__(self, n_clusters=3, similarity_matrix='knn', normalize='normalize_ng', kernel='self_tuning', sym='max', eigen_solver='auto', random_state=0, n_init='auto', n_neighbors=15, **kwargs):
         self.similarity_matrix=similarity_matrix
-        self.K = int(n_clusters)
+        self.n_clusters = n_clusters
         self.normalize=normalize
         self.kernel = kernel
         self.sym = sym
@@ -280,22 +271,22 @@ class BaseSpectralClustering(BaseEstimator, ClusterMixin):
             # Compute Laplacian 
             Lsym, _ = self.compute_laplacian(X, laplacian='sym')
             # Get first k eigenvectors 
-            self.get_eigenvec_laplacian(Lsym, self.K)
+            self.get_eigenvec_laplacian(Lsym, self.n_clusters)
             U = self.U_
             T = U/(np.linalg.norm(U, axis=1, keepdims=True)+1e-12)
             self.embedding_ = T # (row embedding)
         elif self.normalize=='normalize_shi':
             L, D = self.compute_laplacian(X, laplacian='unnormalized')
-            self.get_geigenvec_laplacian(L, D, self.K)
+            self.get_geigenvec_laplacian(L, D, self.n_clusters)
             self.embedding_ = self.U_
         else: 
             L, _ = self.compute_laplacian(X, laplacian='unnormalized')
-            self.get_eigenvec_laplacian(L, self.K)
+            self.get_eigenvec_laplacian(L, self.n_clusters)
             self.embedding_ = self.U_ # (row embedding)
         
-        km = KMeans(n_clusters=self.K, n_init=self.n_init, random_state=self.random_state)
+        km = KMeans(n_clusters=self.n_clusters, n_init=self.n_init, random_state=self.random_state)
         self.labels_ = km.fit_predict(self.embedding_)
-        self.clusters_ = [np.flatnonzero(self.labels_ == c) for c in range(self.K)]
+        self.clusters_ = [np.flatnonzero(self.labels_ == c) for c in range(self.n_clusters)]
         return self
 
     def fit_predict(self, X, **kwargs):
@@ -304,15 +295,6 @@ class BaseSpectralClustering(BaseEstimator, ClusterMixin):
     def predict(self, X, **kwargs):
         """ just an alias for fit predict, this is not generative """
         return self.fit_predict(X, **kwargs)
-
-    def get_params(self, deep=True):
-        return {"n_clusters": self.K, "n_neighbors": self.n_neighbors, "similarity_matrix":self.similarity_matrix, "normalize":self.normalize}
-
-    def set_params(self, **params):
-        for key, value in params.items():
-            setattr(self, key, value)
-        return self
-        
 
 class FastSpectralClustering(BaseEstimator, ClusterMixin):
     """
@@ -324,7 +306,7 @@ class FastSpectralClustering(BaseEstimator, ClusterMixin):
         sp_base = BaseSpectralClustering(n_clusters=n_clusters, random_state=0)
         self.base_sp = sp_base 
         self.random_state = random_state
-        self.K = n_clusters
+        self.n_clusters = n_clusters
         
     def _power_method(self, M, X_init, t):
         # X_init, _ = np.linalg.qr(X_init, mode="reduced")
@@ -342,28 +324,20 @@ class FastSpectralClustering(BaseEstimator, ClusterMixin):
         else:
             I = np.eye(n)
         M = I - 0.5*L
-        l = kwargs.get("l", max(int(np.ceil(np.log(self.K))), 1))
-        t = kwargs.get("t", max(int(np.ceil(10 * np.log(n/self.K))),1))
+        l = kwargs.get("l", max(int(np.ceil(np.log(self.n_clusters))), 1))
+        t = kwargs.get("t", max(int(np.ceil(10 * np.log(n/self.n_clusters))),1))
         Y = np.empty((n, l))
         for it in range(l):
             x0 = rng.normal(size=(n,))
             Y[:,it] = self._power_method(M, x0, t)
         
         inv_sqrt_D = 1.0 / np.sqrt(np.maximum(D, 1e-12))
-        self.km = KMeans(n_clusters=self.K, random_state=self.random_state)
+        self.km = KMeans(n_clusters=self.n_clusters, random_state=self.random_state)
         Z = inv_sqrt_D[:, None] * Y
         self.embedding_ = Z # / (np.linalg.norm(Z, axis=1, keepdims=True) + 1e-12)
         self.labels_ = self.km.fit_predict(self.embedding_)
-        self.clusters_ = [np.flatnonzero(self.labels_ == c) for c in range(self.K)]
+        self.clusters_ = [np.flatnonzero(self.labels_ == c) for c in range(self.n_clusters)]
 
-        return self
-
-    def get_params(self, deep=True):
-        return {"n_clusters": self.K}
-
-    def set_params(self, **params):
-        for key, value in params.items():
-            setattr(self, key, value)
         return self
 
     def fit_predict(self, X, **kwargs):
@@ -461,16 +435,6 @@ class SpectralClusteringAffinity(BaseEstimator, ClusterMixin):
 
     def predict(self, X, y=None):
         return self.fit_predict(X)
-
-    def get_params(self, deep=True):
-        return {"n_clusters": self.n_clusters, "n_components": self.n_components, "alpha": self.alpha, "n_neighbors": self.n_neighbors, "affinity":self.affinity}
-
-    def set_params(self, **params):
-        for key, value in params.items():
-            setattr(self, key, value)
-        return self
-
-
 
 class GammaMixture(BaseEstimator, ClusterMixin):
     """

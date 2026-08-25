@@ -13,15 +13,17 @@ from sklearn.base import clone
 def data_split(X, method='split', n_split=1, ratio=0.6, shuffle=True, random_state=234, ind=False):
     if method=='split':
         n = X.shape[0]
+        indices = np.arange(n)
         if shuffle: 
             rng = np.random.RandomState(random_state)
-            indices = np.arange(n)
             rng.shuffle(indices)
-            X_train = X[indices[int(ratio*n):]]
-            X_test = X[indices[:int(ratio*n)]]
-        else:
-            X_train = X[int(ratio*n):]
-            X_test = X[:int(ratio*n)]
+        n_train = int(ratio*n)
+        train_idx = indices[:n_train]
+        test_idx = indices[n_train:]
+        X_train = X[train_idx]
+        X_test = X[test_idx]
+        if ind:
+            return [(X_train, X_test, (train_idx, test_idx))]
         return [(X_train, X_test)]
     if method == 'k_fold':
         return k_fold_split(X, n_split=n_split, shuffle=shuffle, random_state=random_state, ind=ind)

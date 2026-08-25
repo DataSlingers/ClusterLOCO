@@ -17,29 +17,47 @@ from sklearn.metrics import adjusted_rand_score
 
 from clim.utils.utils import *
 
-def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(), K=None, seed=24, error_metric=None,use_proba=True, n_jobs=-1):
+def _configure_cluster_count(model, K, count_param=None):
+    """Clone a clustering model and resolve its cluster-count parameter."""
+    model = clone(model)
+    params = model.get_params(deep=False)
+
+    if count_param is None:
+        if "n_clusters" in params:
+            count_param = "n_clusters"
+        elif "n_components" in params:
+            count_param = "n_components"
+        else:
+            raise ValueError(
+                f"{type(model).__name__} exposes neither 'n_clusters' "
+                "nor 'n_components'."
+            )
+
+    if count_param not in params:
+        raise ValueError(
+            f"{type(model).__name__} has no parameter {count_param!r}."
+        )
+
+    if K is None:
+        K = params[count_param]
+    else:
+        model.set_params(**{count_param: K})
+
+    if K is None:
+        raise ValueError(
+            f"{type(model).__name__}.{count_param} is None; provide K explicitly."
+        )
+
+    return model, K
+
+
+def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(), K=None, seed=24, error_metric=None,use_proba=True, n_jobs=-1, cluster_count_param=None):
     n_tr, p = X_tr.shape
     n_ca, _ = X_ca.shape
     
     np.random.seed(seed)
     
-    if K is not None:
-        try:
-            params = model.get_params()
-    
-            if "n_clusters" not in params:
-                print(
-                    "Estimator does not have n_clusters; pre-specify cluster number "
-                    "with the right method before passing model"
-                )
-            elif params["n_clusters"] is None:
-                model.set_params(n_clusters=K)
-                print(f"Set n_clusters to {K}")
-            else:
-                print(f"n_clusters already set to {params['n_clusters']}; skipping reset")
-    
-        except AttributeError:
-            print("Estimator does not support get_params/set_params")
+    model, K = _configure_cluster_count(model, K, cluster_count_param)
     
     train_model, test_model = clone(model), clone(model)
   
@@ -49,29 +67,32 @@ def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(
     except:
         train_model.fit(X_tr)
         y_tr = train_model.predict(X_tr)
+
     try:
         y_ca = test_model.fit_predict(X_ca)
     except:  
         test_model.fit(X_ca)
-        y_ca = train_model.predict(X_tr)
+        y_ca = test_model.predict(X_ca)
 
     # Fit classifier on training
     transfer_clf = clone(clf)
-    transfer_clf.fit(X_tr, y_tr) 
+    transfer_clf.fit(X_tr, y_tr)
+    # Predict with hard classifier
+    z_ca = transfer_clf.predict(X_ca) 
     
     # Compute error on calibration set 
     if hasattr(transfer_clf, "predict_proba"): # soft classifier
         # Error on calibration set
         prob_ca = transfer_clf.predict_proba(X_ca)
         # align via hard labels
-        z_ca = transfer_clf.predict(X_ca)
+        
         ca_mapping = label_alignment(z_ca, y_ca, K) # align cluster labels to classifier labels
         y_ca_aligned = ca_mapping[y_ca]
         
         if error_metric==None: # defaults to hinge
             errors = 1.0 - prob_ca[np.arange(n_ca), y_ca_aligned]
         elif error_metric=='ARI': 
-            errors = adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
+            errors = - adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
         elif use_proba:
             errors = error_metric(y_ca_aligned, prob_ca)
         else:
@@ -106,6 +127,7 @@ def compute_loco_error(X_tr, X_ca, model, K, error_metric, clf, feature, use_pro
     except:    
         train_model.fit(X_tr)
         y_tr = train_model.predict(X_tr)
+        
         test_model.fit(X_ca)
         y_ca = test_model.predict(X_ca) 
 
@@ -116,23 +138,23 @@ def compute_loco_error(X_tr, X_ca, model, K, error_metric, clf, feature, use_pro
     X_ca_j = np.delete(X_ca, feature, axis=1)
     clf_j.fit(X_tr_j, y_tr) 
     assert len(clf_j.classes_) == K, "need more samples, classes don't match cluster number" 
-    
+    # Predict hard classifier
+    z_ca = clf_j.predict(X_ca_j)
     # Compute error on calibration set 
     if hasattr(clf_j, "predict_proba"): # soft classifier
         # Error on calibration set
         prob_ca = clf_j.predict_proba(X_ca_j)
         # align via hard labels
-        z_ca = clf_j.predict(X_ca_j)
         ca_mapping = label_alignment(z_ca, y_ca, K) # align cluster labels to classifier labels
         y_ca_aligned = ca_mapping[y_ca]
         if error_metric==None:
             errors = 1.0 - prob_ca[np.arange(n_ca), y_ca_aligned]
         elif error_metric=='ARI': 
-            errors = adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
+            errors = -adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
         elif use_proba:
             errors = error_metric(y_ca_aligned, prob_ca)
         else:
             errors = error_metric(z_ca, y_ca_aligned)
     else: 
-        errors = adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
+        errors = -adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
     return errors
