@@ -17,7 +17,7 @@ Non conformity scores for regression/prediction
     - L1 score
 """
 import numpy as np
-from  .utils import match_labels
+from .utils import match_labels_generalized
 
 def hinge_error(y_true, probs):
     """ Hinge error from probability class 
@@ -38,11 +38,11 @@ def hamming_distance(y_true, y_pred):
     """ Hamming distance (see Lange)
             d(y_pred, y_true) = 1/n * sum_i 1(y_pred != y_true)
 
-        y_true: true labels {0, ..., K-1}
-        y_preds: predicted labels (unaligned), {0, ..., K-1}
+        y_true: reference labels for each observation
+        y_pred: predicted labels (unaligned) for the same observations
     """
     # realign
-    y_preds_aligned = match_labels(y_pred, y_true)
+    y_preds_aligned = match_labels_generalized(y_true, y_pred)
     d = np.mean(1 * (y_preds_aligned!=y_true))
     return d
 

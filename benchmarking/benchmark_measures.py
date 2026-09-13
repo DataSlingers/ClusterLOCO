@@ -46,6 +46,7 @@ from .prototypes import *
 import sys
 sys.path.append("../")
 from clim.utils.model_selection import *
+from clim.utils import match_labels_generalized
 from clim.utils.utils import *
 
 class Fuzzy_CSHAP_explainer:
@@ -621,8 +622,8 @@ class GlobalStability():
             C2 = model2.fit_predict(X2)
 
             # align to reference 
-            C1 = match_labels(ref_labels[O], C1[idx1_map])
-            C2 = match_labels(ref_labels[O], C2[idx2_map])
+            C1 = match_labels_generalized(ref_labels[O], C1[idx1_map])
+            C2 = match_labels_generalized(ref_labels[O], C2[idx2_map])
             
             M, W = self._consensus_update(M, W, C1, C2, O)
         else: 
@@ -631,8 +632,8 @@ class GlobalStability():
             C2 = model2.fit_predict(X2_j)
 
             # align to reference 
-            C1 = match_labels(ref_labels[O], C1[idx1_map])
-            C2 = match_labels(ref_labels[O], C2[idx2_map])
+            C1 = match_labels_generalized(ref_labels[O], C1[idx1_map])
+            C2 = match_labels_generalized(ref_labels[O], C2[idx2_map])
 
             M, W = self._consensus_update(M, W, C1, C2, O)
 
@@ -786,4 +787,3 @@ def _metric_wants_proba(metric, y_true, K):
         return bool(getattr(out, "proba", False))
     except Exception:
         return False
-

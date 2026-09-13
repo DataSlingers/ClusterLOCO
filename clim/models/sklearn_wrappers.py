@@ -269,18 +269,18 @@ class BaseSpectralClustering(BaseEstimator, ClusterMixin):
     def fit(self, X, **kwargs):
         if self.normalize=='normalize_ng': 
             # Compute Laplacian 
-            Lsym, _ = self.compute_laplacian(X, laplacian='sym')
+            Lsym, _ = self.compute_laplacian(X, laplacian='sym', **kwargs)
             # Get first k eigenvectors 
             self.get_eigenvec_laplacian(Lsym, self.n_clusters)
             U = self.U_
             T = U/(np.linalg.norm(U, axis=1, keepdims=True)+1e-12)
             self.embedding_ = T # (row embedding)
         elif self.normalize=='normalize_shi':
-            L, D = self.compute_laplacian(X, laplacian='unnormalized')
+            L, D = self.compute_laplacian(X, laplacian='unnormalized', **kwargs)
             self.get_geigenvec_laplacian(L, D, self.n_clusters)
             self.embedding_ = self.U_
         else: 
-            L, _ = self.compute_laplacian(X, laplacian='unnormalized')
+            L, _ = self.compute_laplacian(X, laplacian='unnormalized', **kwargs)
             self.get_eigenvec_laplacian(L, self.n_clusters)
             self.embedding_ = self.U_ # (row embedding)
         

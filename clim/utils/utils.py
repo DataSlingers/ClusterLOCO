@@ -124,6 +124,26 @@ def match_labels(y_true, y_pred,return_map=False):
             y_pred_aligned, _ = align_labels_confusion(y_true, y_pred)
             return y_pred_aligned
             
+def match_labels_generalized(y_true, y_pred, return_map=False):
+    """Align paired label vectors, allowing noncontiguous or differing label sets.
+
+    Both inputs must be one-dimensional and describe the same observations.
+    Unmatched predicted labels are left unchanged. With ``return_map=True``,
+    return ``(mapping, aligned_labels)``, matching the legacy function's order.
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    if y_true.ndim != 1 or y_pred.ndim != 1:
+        raise ValueError("Labels must be one-dimensional")
+    if y_true.shape != y_pred.shape:
+        raise ValueError("Labels must have the same length")
+    if y_true.size == 0:
+        return ({}, y_pred.copy()) if return_map else y_pred.copy()
+
+    aligned, mapping = align_labels_confusion(y_true, y_pred, return_map=True)
+    return (mapping, aligned) if return_map else aligned
+
+
 def label_alignment(t, s, K):
     """ Alternative (faster when N big) to match_labels that returns the permutation. To get y_pred, use aligned_s = col_ind[s] """
     if len(t) != len(s):

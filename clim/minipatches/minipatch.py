@@ -113,6 +113,7 @@ def get_minipatch(X_arr, y_arr, ratio_x, ratio_y, seed=None):
 def fast_minipatches(N, M, B, alpha_N, alpha_M, rng=None, print_patch_size=True):
     """Return list of (I_t, F_t) index arrays (obs, feats). Does not pass X or y. 
     """
+    rng = np.random.RandomState() if rng is None else rng
     m = max(1, int(np.floor(alpha_N * N)))
     r = max(1, int(np.floor(alpha_M * M)))
     if print_patch_size:

@@ -6,7 +6,7 @@ from .non_conformity_scores import (
     l1_error,
     l2_error,
 )
-from .utils import match_labels, transform_scores_to_ranking
+from .utils import match_labels, match_labels_generalized, transform_scores_to_ranking
 
 __all__ = [
     "hinge_error",
@@ -16,5 +16,6 @@ __all__ = [
     "l1_error",
     "l2_error",
     "match_labels",
+    "match_labels_generalized",
     "transform_scores_to_ranking",
 ]
