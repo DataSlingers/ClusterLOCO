@@ -1,0 +1,1740 @@
+{
+  "difficulty_regimes": {
+    "gaussian": {
+      "easy": {
+        "alpha": 2.2
+      },
+      "hard": {
+        "alpha": 1.7
+      }
+    },
+    "moon-donut": {
+      "easy": {
+        "alpha": 2.4
+      },
+      "hard": {
+        "alpha": 1.2
+      }
+    },
+    "gamma": {
+      "easy": {
+        "alpha": 10
+      },
+      "hard": {
+        "alpha": 1
+      }
+    }
+  },
+  "experiments": {
+    "gaussian_20": {
+      "name": "gaussian_20",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gaussian",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 10
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 10
+            }
+          ],
+          "alpha": 2.2
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 10
+            }
+          ],
+          "alpha": 1.7
+        }
+      }
+    },
+    "gaussian_50": {
+      "name": "gaussian_50",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gaussian",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 40
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 40
+            }
+          ],
+          "alpha": 2.2
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 40
+            }
+          ],
+          "alpha": 1.7
+        }
+      }
+    },
+    "gaussian_200": {
+      "name": "gaussian_200",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gaussian",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 190
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 190
+            }
+          ],
+          "alpha": 2.2
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 190
+            }
+          ],
+          "alpha": 1.7
+        }
+      }
+    },
+    "gaussian_500": {
+      "name": "gaussian_500",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gaussian",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 490
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 490
+            }
+          ],
+          "alpha": 2.2
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 490
+            }
+          ],
+          "alpha": 1.7
+        }
+      }
+    },
+    "gaussian_1000": {
+      "name": "gaussian_1000",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gaussian",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 990
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 990
+            }
+          ],
+          "alpha": 2.2
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gaussian",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 990
+            }
+          ],
+          "alpha": 1.7
+        }
+      }
+    },
+    "moon_20": {
+      "name": "moon_20",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 2,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "donut": 0.5,
+          "moon": 0.5
+        },
+        "topk": 10,
+        "sim_method": "moon-donut",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 10
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 10
+            }
+          ],
+          "alpha": 2.4
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 10
+            }
+          ],
+          "alpha": 1.2
+        }
+      }
+    },
+    "moon_50": {
+      "name": "moon_50",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 2,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "donut": 0.5,
+          "moon": 0.5
+        },
+        "topk": 10,
+        "sim_method": "moon-donut",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 40
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 40
+            }
+          ],
+          "alpha": 2.4
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 40
+            }
+          ],
+          "alpha": 1.2
+        }
+      }
+    },
+    "moon_200": {
+      "name": "moon_200",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 2,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "donut": 0.5,
+          "moon": 0.5
+        },
+        "topk": 10,
+        "sim_method": "moon-donut",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 90
+          },
+          {
+            "type": "uniform",
+            "d": 100
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 90
+            },
+            {
+              "type": "uniform",
+              "d": 100
+            }
+          ],
+          "alpha": 2.4
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 90
+            },
+            {
+              "type": "uniform",
+              "d": 100
+            }
+          ],
+          "alpha": 1.2
+        }
+      }
+    },
+    "moon_500": {
+      "name": "moon_500",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 2,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "donut": 0.5,
+          "moon": 0.5
+        },
+        "topk": 10,
+        "sim_method": "moon-donut",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 200
+          },
+          {
+            "type": "uniform",
+            "d": 190
+          },
+          {
+            "type": "permuted",
+            "d": 100
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 200
+            },
+            {
+              "type": "uniform",
+              "d": 190
+            },
+            {
+              "type": "permuted",
+              "d": 100
+            }
+          ],
+          "alpha": 2.4
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 200
+            },
+            {
+              "type": "uniform",
+              "d": 190
+            },
+            {
+              "type": "permuted",
+              "d": 100
+            }
+          ],
+          "alpha": 1.2
+        }
+      }
+    },
+    "moon_1000": {
+      "name": "moon_1000",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 2,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "donut": 0.5,
+          "moon": 0.5
+        },
+        "topk": 10,
+        "sim_method": "moon-donut",
+        "noise_plan": [
+          {
+            "type": "gaussian",
+            "d": 290
+          },
+          {
+            "type": "uniform",
+            "d": 400
+          },
+          {
+            "type": "permuted",
+            "d": 300
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 290
+            },
+            {
+              "type": "uniform",
+              "d": 400
+            },
+            {
+              "type": "permuted",
+              "d": 300
+            }
+          ],
+          "alpha": 2.4
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 2,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "donut": 0.5,
+            "moon": 0.5
+          },
+          "topk": 10,
+          "sim_method": "moon-donut",
+          "noise_plan": [
+            {
+              "type": "gaussian",
+              "d": 290
+            },
+            {
+              "type": "uniform",
+              "d": 400
+            },
+            {
+              "type": "permuted",
+              "d": 300
+            }
+          ],
+          "alpha": 1.2
+        }
+      }
+    },
+    "gamma_20": {
+      "name": "gamma_20",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gamma",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 10
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 10
+            }
+          ],
+          "alpha": 10
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 10
+            }
+          ],
+          "alpha": 1
+        }
+      }
+    },
+    "gamma_50": {
+      "name": "gamma_50",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gamma",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 20
+          },
+          {
+            "type": "gaussian",
+            "d": 20
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 20
+            },
+            {
+              "type": "gaussian",
+              "d": 20
+            }
+          ],
+          "alpha": 10
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 20
+            },
+            {
+              "type": "gaussian",
+              "d": 20
+            }
+          ],
+          "alpha": 1
+        }
+      }
+    },
+    "gamma_200": {
+      "name": "gamma_200",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gamma",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 100
+          },
+          {
+            "type": "gaussian",
+            "d": 90
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 100
+            },
+            {
+              "type": "gaussian",
+              "d": 90
+            }
+          ],
+          "alpha": 10
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 100
+            },
+            {
+              "type": "gaussian",
+              "d": 90
+            }
+          ],
+          "alpha": 1
+        }
+      }
+    },
+    "gamma_500": {
+      "name": "gamma_500",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gamma",
+        "noise_plan": [
+          {
+            "type": "uniform",
+            "d": 95
+          },
+          {
+            "type": "gaussian",
+            "d": 95
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 95
+            },
+            {
+              "type": "gaussian",
+              "d": 95
+            }
+          ],
+          "alpha": 10
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "uniform",
+              "d": 95
+            },
+            {
+              "type": "gaussian",
+              "d": 95
+            }
+          ],
+          "alpha": 1
+        }
+      }
+    },
+    "gamma_1000": {
+      "name": "gamma_1000",
+      "shared": {
+        "K": 7,
+        "n_per_cluster": 200,
+        "sim_seed": 123,
+        "embed_seed": 123,
+        "d0": 10,
+        "informative_d": 10,
+        "B": 5000,
+        "B_ramp": 5000,
+        "standardize": false,
+        "oversample": 10,
+        "gaps": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "shape_probs": {
+          "moon": 0.5,
+          "donut": 0.5
+        },
+        "topk": 10,
+        "sim_method": "gamma",
+        "noise_plan": [
+          {
+            "type": "permuted",
+            "d": 200
+          },
+          {
+            "type": "uniform",
+            "d": 500
+          },
+          {
+            "type": "gaussian",
+            "d": 290
+          }
+        ]
+      },
+      "difficulties": {
+        "easy": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "permuted",
+              "d": 200
+            },
+            {
+              "type": "uniform",
+              "d": 500
+            },
+            {
+              "type": "gaussian",
+              "d": 290
+            }
+          ],
+          "alpha": 10
+        },
+        "hard": {
+          "K": 7,
+          "n_per_cluster": 200,
+          "sim_seed": 123,
+          "embed_seed": 123,
+          "d0": 10,
+          "informative_d": 10,
+          "B": 5000,
+          "B_ramp": 5000,
+          "standardize": false,
+          "oversample": 10,
+          "gaps": [
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02,
+            0.02
+          ],
+          "shape_probs": {
+            "moon": 0.5,
+            "donut": 0.5
+          },
+          "topk": 10,
+          "sim_method": "gamma",
+          "noise_plan": [
+            {
+              "type": "permuted",
+              "d": 200
+            },
+            {
+              "type": "uniform",
+              "d": 500
+            },
+            {
+              "type": "gaussian",
+              "d": 290
+            }
+          ],
+          "alpha": 1
+        }
+      }
+    }
+  }
+}
