@@ -8,6 +8,15 @@ Keep track of ARI of base simulation and H-D simulation for assessing task's dif
 3) Gaussian mixture (easy)
 
 Author: Claire He
+
+Runtime controls: --outer-jobs 1 isolates simulations; --inner-jobs controls
+workers within each simulation. --prediction-cache auto spills to temporary
+storage above --cache-mib (256 MiB per simulation by default). JSON experiment
+settings B, B_ramp, B_shapley, patch_batch_size, prediction_cache,
+max_cache_bytes and cache_dir are honored; explicit cache CLI options override
+JSON settings. B_shapley defaults to the previous effective c-SHAP budget, 100.
+Output retains the Figure 2 keys and adds time_cloc_fit, time_cloc_score and
+runtime_config. Both cloc and rampart now use ClusterLOCOMPStream.
 """
 
 import numpy as np
@@ -15,25 +24,60 @@ import time
 import os
 import json
 import argparse
+from functools import wraps
+from pathlib import Path
+from joblib import Parallel, delayed, parallel_config, cpu_count
+from threadpoolctl import threadpool_limits
 
-from sklearn.mixture import GaussianMixture
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import clone
-from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import *
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import adjusted_rand_score
 
 import sys
-sys.path.append('../')
-from clim import Cluster_LOCO_Split, ClusterLOCOMP, ClusterLOCO_RAMPART, GlobalStability_MP
-from clim.utils import hinge_error
-from clim.models import BaseSpectralClustering, GammaMixture
-from benchmarking import LRP_score, PBFI, c_SHAP, feature_imp_cluster
-from simulations import *
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from clim import RAMPART, GlobalStability_MP
+from clim.data_splitting import Cluster_LOCO_Split
+from clim.minipatches import ClusterLOCOMPStream
+from clim.utils import hinge_error, transform_scores_to_ranking
+from clim.models import BaseSpectralClustering
+from simulations import BaseSimulator, GenerateCovariances
+from simulations.simulators import permute_feature
 
 
-N_JOBS=8
+def _load_benchmarks():
+    # Keep --help and the LOCO helper usable without optional PyTorch.
+    from benchmarking import LRP_score, PBFI, c_SHAP, feature_imp_cluster
+    return LRP_score, PBFI, c_SHAP, feature_imp_cluster
+
+
+def _limit_benchmark_threads(function):
+    @wraps(function)
+    def run(*args, **kwargs):
+        # Discover native pools after importing optional libraries such as torch.
+        _load_benchmarks()
+        with threadpool_limits(limits=1):
+            return function(*args, **kwargs)
+    return run
+
+
+def fit_cached_cloc(X, *, K, B, base_clusterer, standardize=True,
+                    alpha_N=0.2, alpha_M=0.2, inner_n_jobs=1,
+                    patch_batch_size=16, prediction_cache="auto",
+                    max_cache_bytes=256 * 1024**2, cache_dir=None):
+    """Shared streamed/cached evaluator for ordinary LOCO-MP and RAMPART."""
+    model = ClusterLOCOMPStream(K=K, B=B, base_clusterer=base_clusterer)
+    t0 = time.perf_counter()
+    model.fit_stream(X, alpha_N=alpha_N, alpha_M=alpha_M,
+                     standardize=standardize, n_jobs=inner_n_jobs,
+                     patch_batch_size=patch_batch_size)
+    fit_seconds = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    scores = model.score(hinge_error, cache=prediction_cache,
+                         max_cache_bytes=max_cache_bytes, cache_dir=cache_dir)
+    score_seconds = time.perf_counter() - t0
+    return scores, model, fit_seconds, score_seconds
 
 def topk_overlap(scores, true_idx, k, signed=False):
     s = np.asarray(scores, dtype=float).reshape(-1)
@@ -86,8 +130,12 @@ def generate_dataset_for_one_run(*, sim_method: str, sim_seed: int, embed_seed: 
     return X_aug, y
     
 
+@_limit_benchmark_threads
 def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 10, base_clusterer=None,
-        B: int = 100, B_ramp: int = 200, B_shapley: int = 1000, standardize: bool = True, topk: int | None = None,):
+        B: int = 5000, B_ramp: int = 1000, B_shapley: int = 100,
+        standardize: bool = True, topk: int | None = None, inner_n_jobs: int = 1,
+        patch_batch_size: int = 16, prediction_cache: str = "auto",
+        max_cache_bytes: int = 256 * 1024**2, cache_dir: str | None = None):
     """
     Returns dict with score vectors for benchmark and our methods
     """
@@ -103,9 +151,14 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     if topk is None:
         topk = informative_d  
 
+    LRP_score, PBFI, c_SHAP, feature_imp_cluster = _load_benchmarks()
     topk_hits = {} 
     times = {} 
     ari = {}
+    phase_times = {}
+    cache_options = dict(inner_n_jobs=inner_n_jobs, patch_batch_size=patch_batch_size,
+                         prediction_cache=prediction_cache,
+                         max_cache_bytes=max_cache_bytes, cache_dir=cache_dir)
         
     print("======== Compute PBFI ========")
     # ---- Score 1: PBFI ----
@@ -142,7 +195,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     print("======== Split Cluster LOCO ========")
     X_tr, X_va, y_tr, y_va = train_test_split(X_aug, y, test_size=0.5, stratify=y)
     t0 = time.perf_counter()
-    split_cloc, _ = Cluster_LOCO_Split(X_tr, X_va, model=base_clusterer, clf = RandomForestClassifier(), K=K,error_metric=None, n_jobs=N_JOBS)
+    split_cloc, _ = Cluster_LOCO_Split(X_tr, X_va, model=base_clusterer, clf = RandomForestClassifier(), K=K,error_metric=None, n_jobs=inner_n_jobs)
     times['split_cloc']=time.perf_counter()-t0
     if split_cloc.size != p:
         raise ValueError(f"Cluster LOCO Split returned {split_cloc.size} features, expected {p}")
@@ -150,10 +203,11 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     
     # ---- Score 5: ClusterLOCOMP hinge_error ----
     print("======== Cluster LOCOMP ========")
-    g = ClusterLOCOMP(base_clusterer=clone(base_clusterer), K=K)
     t0 = time.perf_counter()
-    g.fit(X_aug, B=5000, alpha_M=0.2, alpha_N = 0.2, standardize=standardize, parallel={'n_jobs_features':N_JOBS})
-    cloc_out = g.score(hinge_error)
+    cloc_out, g, fit_seconds, score_seconds = fit_cached_cloc(
+        X_aug, K=K, B=B, base_clusterer=base_clusterer,
+        standardize=standardize, **cache_options)
+    phase_times.update(cloc_fit=fit_seconds, cloc_score=score_seconds)
     times['cloc']=time.perf_counter() - t0
     
     # adjust extraction for return type
@@ -165,26 +219,23 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     if cloc_raw.size != p:
         raise ValueError(f"ClusterLOCOMP returned {cloc_raw.size} features, expected {p}")
 
-    ari['cloc'] = adjusted_rand_score(y, g.z_test)
+    ari['cloc'] = adjusted_rand_score(y, g.z_ref)
+    del g, cloc_out  # Release the ensemble before RAMPART fits more models.
 
     # ---- Score 6: RAMPART Cluster LOCO hinge_error ----
     print('======= ClusterLOCO RAMPART =======')
-    gen_fn = ClusterLOCO_RAMPART(
-        K=K,
-        base_clusterer=clone(base_clusterer),
-        error_metric=hinge_error,
-        alpha_N = 0.2,
-        alpha_M = 0.2,
-        parallel_MP=True,
-        parallel={"n_jobs_features": N_JOBS, "backend": "loky", "prefer": "processes", "verbose": 0},
-        standardize=True,
-        z_for_score="z_test",
-    )
+    def gen_fn(X_sub, *, B, alpha_N, alpha_M, **_ignored):
+        scores, model, _, _ = fit_cached_cloc(
+            X_sub, K=K, B=B, base_clusterer=base_clusterer,
+            alpha_N=alpha_N, alpha_M=alpha_M,
+            standardize=standardize, **cache_options)
+        return dict(scores, z_ref=model.z_ref), model
+
     t0 = time.perf_counter()
     out = RAMPART(
         X_aug,
         generalizability_fn=gen_fn,
-        B=1000,
+        B=B_ramp,
         ranking_fn=transform_scores_to_ranking,
         top_k=topk,
         gen_kwargs={},  
@@ -194,7 +245,8 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     rampart_raw[out['selected_indices']] = out['selected_scores']
     ramp_pos = out['selected_indices']
     
-    ari['rampart'] = adjusted_rand_score(y, out['z_i'])
+    ari['rampart'] = adjusted_rand_score(y, out['z_ref'])
+    del out
 
     # ---- Score 7: Permutation -----
     print("======== Permutation ========")
@@ -207,7 +259,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     # ---- Score 8: c-SHAP ----
     print("======== c-SHAP ========")
     t0 = time.perf_counter()
-    cshap_raw, shap_labels = c_SHAP(X=X_aug, K=K, method='kernel', X_reference=X_aug).get_model_wide_importance()
+    cshap_raw, shap_labels = c_SHAP(X=X_aug, K=K, method='kernel', X_reference=X_aug, M=B_shapley, n_jobs=inner_n_jobs).get_model_wide_importance()
     times['cshap'] = time.perf_counter() - t0
     ari['cshap'] = adjusted_rand_score(y, shap_labels)
 
@@ -226,13 +278,16 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     return {
         "true_features":np.array([1.0]*informative_d + [0.0]*noise_d),
         "times":times,
+        "phase_times": phase_times,
         "topk_recall": topk_hits,
         "ari": ari,
     }
 
-def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed: int, out_dir: str):
+def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed: int, out_dir: str, inner_n_jobs: int = 1):
     os.makedirs(out_dir, exist_ok=True)
-    cfg_id = 0
+    cfg = dict(B=5000, B_ramp=1000, B_shapley=100, patch_batch_size=16,
+               prediction_cache="auto", max_cache_bytes=256 * 1024**2,
+               cache_dir=None, standardize=True) | cfg
     # experiment constants
     sim_method = cfg.get("sim_method", "non-gaussian")
     K = int(cfg["K"])
@@ -244,9 +299,7 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
     p = informative_d + noise_d
 
     # base clusterer (create once per task)  
-    if sim_method == 'moon-donut':
-        base_clusterer = BaseSpectralClustering(n_clusters=K)
-    if sim_method == 'swiss-roll':
+    if sim_method in {'moon-donut', 'swiss-roll'}:
         base_clusterer = BaseSpectralClustering(n_clusters=K)
     else:
     # For GMM and Gamma
@@ -254,7 +307,7 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
 
     methods = ["pbfi", "lrp", "impacc", "split_cloc", "cloc", "rampart","perm", "cshap"] # , "rampshap"]
 
-    scores = {m: np.zeros((n_sims, p), dtype=float) for m in methods}
+    phase_times = {m: np.zeros(n_sims) for m in ("cloc_fit", "cloc_score")}
     times = {m: np.zeros((n_sims,), dtype=float) for m in methods}
     topk_hits = {m: np.zeros((n_sims,), dtype=float) for m in methods}
     difficulty = {m: np.zeros(n_sims) for m in methods} #  ["spectral","fast-spectral","kmeans","gmm"]
@@ -287,10 +340,18 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
             base_clusterer=base_clusterer,
             B=int(cfg.get("B", 5000)),
             B_ramp=int(cfg.get("B_ramp", 1000)),
-            B_shapley=int(cfg.get("B_shapley", 1000)),
+            B_shapley=int(cfg.get("B_shapley", 100)),
             standardize=bool(cfg.get("standardize", True)),
             topk=topk,
+            inner_n_jobs=inner_n_jobs,
+            patch_batch_size=int(cfg.get("patch_batch_size", 16)),
+            prediction_cache=cfg.get("prediction_cache", "auto"),
+            max_cache_bytes=int(cfg.get("max_cache_bytes", 256 * 1024**2)),
+            cache_dir=cfg.get("cache_dir"),
         )
+
+        for phase in phase_times:
+            phase_times[phase][t] = out["phase_times"][phase]
 
         for m in methods:
             times[m][t] = float(out["times"][m])
@@ -300,7 +361,11 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
     out_path = os.path.join(out_dir, f"results_task{task_id:05d}.npz")
     np.savez_compressed(
         out_path,
-        # cfg_id=np.array([cfg_id], dtype=np.int32),
+        cfg_id=np.array([cfg_id], dtype=np.int32),
+        runtime_config=np.array(json.dumps(dict(
+            cfg, inner_n_jobs=inner_n_jobs, native_threads=1,
+            cloc_implementation="ClusterLOCOMPStream"))),
+        **{f"time_{phase}": values for phase, values in phase_times.items()},
         task_id=np.array([task_id], dtype=np.int32),
         global_seed=np.array([global_seed], dtype=np.int64),
         informative_d=np.array([informative_d], dtype=np.int32),
@@ -320,6 +385,7 @@ def worker(task_id, cfg, n_sims, seed, out_dir, inner_n_jobs):
         task_id=task_id,
         global_seed=seed,
         out_dir=out_dir,
+        inner_n_jobs=inner_n_jobs,
     )
 
 def main():
@@ -329,29 +395,52 @@ def main():
     ap.add_argument("--out-dir", type=str, required=True)
     ap.add_argument("--seed", type=int, default=123)
     ap.add_argument("--n-tasks", type=int, required=True)
-    ap.add_argument("--outer-jobs", type=int, default=2)
+    ap.add_argument("--outer-jobs", type=int, default=1,
+                    help="Concurrent simulations; use 1 for isolated runtime comparisons")
+    ap.add_argument("--inner-jobs", type=int, default=1,
+                    help="Workers per simulation; native threads per worker are capped at 1")
+    ap.add_argument("--patch-batch-size", type=int, default=None)
+    ap.add_argument("--prediction-cache", choices=("auto", "memory", "disk"), default=None)
+    ap.add_argument("--cache-mib", type=int, default=None,
+                    help="RAM cache budget per simulation; excess spills to disk in auto mode")
+    ap.add_argument("--cache-dir", type=str, default=None)
     args = ap.parse_args()
+    if min(args.outer_jobs, args.inner_jobs, args.n_tasks, args.n_sims) < 1:
+        ap.error("job, task and simulation counts must be positive")
+    if min(args.outer_jobs, args.n_tasks) * args.inner_jobs > cpu_count():
+        ap.error("outer-jobs * inner-jobs exceeds the available CPU budget")
+    if args.patch_batch_size is not None and args.patch_batch_size < 1:
+        ap.error("patch-batch-size must be positive")
+    if args.cache_mib is not None and args.cache_mib < 0:
+        ap.error("cache-mib must be nonnegative")
 
     with open(args.config, "r") as f:
         cfg_all = json.load(f)
 
     cfg = dict(cfg_all["experiment"])
+    for key in ("patch_batch_size", "prediction_cache", "cache_dir"):
+        if getattr(args, key) is not None:
+            cfg[key] = getattr(args, key)
+    if args.cache_mib is not None:
+        cfg["max_cache_bytes"] = args.cache_mib * 1024**2
+    cfg["outer_jobs"] = args.outer_jobs
     cfg["gaps"] = cfg.get("gaps", [0.2] * int(cfg["K"]))
     cfg["shape_probs"] = cfg.get("shape_probs", {"donut": 0.5, "moon": 0.5})
     cfg["oversample"] = cfg.get("oversample", 10)
     os.makedirs(args.out_dir, exist_ok=True)
 
-    Parallel(n_jobs=args.outer_jobs, backend="loky", verbose=10)(
-        delayed(worker)(
-            task_id=task_id,
-            cfg=cfg,
-            n_sims=args.n_sims,
-            seed=args.seed,
-            out_dir=args.out_dir,
-            inner_n_jobs=1,
+    with threadpool_limits(limits=1), parallel_config(backend="loky", inner_max_num_threads=1):
+        Parallel(n_jobs=args.outer_jobs, verbose=10)(
+            delayed(worker)(
+                task_id=task_id,
+                cfg=cfg,
+                n_sims=args.n_sims,
+                seed=args.seed,
+                out_dir=args.out_dir,
+                inner_n_jobs=args.inner_jobs,
+            )
+            for task_id in range(args.n_tasks)
         )
-        for task_id in range(args.n_tasks)
-    )
 
 if __name__ == "__main__":
     main()
