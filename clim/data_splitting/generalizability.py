@@ -28,15 +28,10 @@ def _configure_cluster_count(model, K, count_param=None):
         elif "n_components" in params:
             count_param = "n_components"
         else:
-            raise ValueError(
-                f"{type(model).__name__} exposes neither 'n_clusters' "
-                "nor 'n_components'."
-            )
+            raise ValueError(f"{type(model).__name__} exposes neither 'n_clusters' nor 'n_components'.")
 
     if count_param not in params:
-        raise ValueError(
-            f"{type(model).__name__} has no parameter {count_param!r}."
-        )
+        raise ValueError(f"{type(model).__name__} has no parameter {count_param!r}.")
 
     if K is None:
         K = params[count_param]
@@ -44,21 +39,17 @@ def _configure_cluster_count(model, K, count_param=None):
         model.set_params(**{count_param: K})
 
     if K is None:
-        raise ValueError(
-            f"{type(model).__name__}.{count_param} is None; provide K explicitly."
-        )
-
+        raise ValueError(f"{type(model).__name__}.{count_param} is None; provide K explicitly.")
     return model, K
 
 
-def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(), K=None, seed=24, error_metric=None,use_proba=True, n_jobs=-1, cluster_count_param=None):
+def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(), 
+                       K=None, seed=24, error_metric=None,use_proba=True, n_jobs=-1, cluster_count_param=None):
     n_tr, p = X_tr.shape
     n_ca, _ = X_ca.shape
     
     np.random.seed(seed)
-    
     model, K = _configure_cluster_count(model, K, cluster_count_param)
-    
     train_model, test_model = clone(model), clone(model)
   
     # Cluster training data and test data
@@ -97,14 +88,14 @@ def Cluster_LOCO_Split(X_tr, X_ca, model=KMeans(), clf = RandomForestClassifier(
             errors = error_metric(y_ca_aligned, prob_ca)
         else:
             errors = error_metric(z_ca, y_ca_aligned)
-    else: 
+    else:
         errors = - adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
 
     errors_j = Parallel(n_jobs=n_jobs, prefer='processes')(delayed(compute_loco_error)(X_tr, X_ca, model, K, error_metric, clf, feature, use_proba) for feature in range(p))
     errors_j = np.asarray(errors_j).T
     
     if error_metric == 'ARI':
-        cluster_loco = errors - errors_j 
+        cluster_loco = errors_j - errors
         cluster_std = np.zeros(cluster_loco.shape)
     else: 
         errors = errors.reshape(-1, 1)
@@ -150,11 +141,11 @@ def compute_loco_error(X_tr, X_ca, model, K, error_metric, clf, feature, use_pro
         if error_metric==None:
             errors = 1.0 - prob_ca[np.arange(n_ca), y_ca_aligned]
         elif error_metric=='ARI': 
-            errors = -adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
+            errors = - adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
         elif use_proba:
             errors = error_metric(y_ca_aligned, prob_ca)
         else:
             errors = error_metric(z_ca, y_ca_aligned)
     else: 
-        errors = -adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
+        errors = - adjusted_rand_score(y_ca, z_ca) # agnostic to alignment 
     return errors
