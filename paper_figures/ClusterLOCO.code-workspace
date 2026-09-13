@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        },
+        {
+            "path": "../../ClusterLOCO-Inference"
+        },
+        {
+            "path": "../../FI_MP/FI_MP"
+        }
+    ]
+}

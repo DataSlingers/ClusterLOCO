@@ -350,3 +350,28 @@ def simulate_ar1_gmm_for_grid(N, p, K, cluster_sizes, rho, snr, p_signal=25, see
     )
     true_idx = np.arange(p_signal)
     return X, y, true_idx, p_signal, p - p_signal
+
+def sample_gmm(means, covariances, weights, n_samples, seed):
+    """Sample observations and latent component labels from a finite GMM."""
+    rng = np.random.default_rng(seed)
+
+    means = np.asarray(means, dtype=float)
+    covariances = np.asarray(covariances, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+
+    k = len(weights)
+
+    if means.shape[0] != k or covariances.shape[0] != k:
+        raise ValueError("means, covariances, and weights must use the same K.")
+
+    weights = weights / weights.sum()
+
+    y = rng.choice(k, size=n_samples, p=weights)
+    x = np.empty((n_samples, means.shape[1]), dtype=float)
+
+    for component in range(k):
+        idx = np.flatnonzero(y == component)
+
+        if idx.size:
+            x[idx] = rng.multivariate_normal(mean=means[component], cov=covariances[component], size=idx.size)
+    return x, y
