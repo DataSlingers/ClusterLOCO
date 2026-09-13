@@ -42,7 +42,7 @@ def hamming_distance(y_true, y_pred):
         y_preds: predicted labels (unaligned), {0, ..., K-1}
     """
     # realign
-    y_preds_aligned = match_labels(y_preds, y_true)
+    y_preds_aligned = match_labels(y_pred, y_true)
     d = np.mean(1 * (y_preds_aligned!=y_true))
     return d
 
