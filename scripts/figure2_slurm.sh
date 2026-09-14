@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --account=morphogenomics-lab
-#SBATCH --job-name=f2_moons
+#SBATCH --account=stats
+#SBATCH --job-name=fig2
 #SBATCH --output=logs/fig2_all_%A_%a.out
 #SBATCH --error=logs/fig2_all_%A_%a.err
-#SBATCH --array=16-19 # 0-9 for Gaussian, 10-19 for Moon-Donut, 20-29 for Gamma
+#SBATCH --array=0-29 # 0-14 easy, 15-29 hard with 0: gaussian_20, 1: gaussian_50, 2: gaussian_200, 3: gaussian_500, 4: gaussian_1000, 5: moon_20, 6: moon_50, 7: moon_200, 8: moon_500, 9: moon_1000, 10: gamma_20, 11: gamma_50, 12: gamma_200, 13: gamma_500, 14: gamma_1000
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=12:00:00
@@ -28,17 +28,35 @@ export PYTHONUNBUFFERED=1
 export SLURM_CPUS_PER_TASK="${SLURM_CPUS_PER_TASK:-4}"
 
 CONFIG="./scripts/cfgs/experiments.json"
-N_SIMS=5
-
-SEED=$((123 + SLURM_ARRAY_TASK_ID))
-
+N_SIMS=20
 mkdir -p logs
+
+N_SETTINGS=15
+SETTING_INDEX=$(( SLURM_ARRAY_TASK_ID % N_SETTINGS ))
+DIFFICULTY_INDEX=$(( SLURM_ARRAY_TASK_ID / N_SETTINGS ))
+
+if [ "$DIFFICULTY_INDEX" -eq 0 ]; then
+    DIFFICULTY="easy"
+else
+    DIFFICULTY="hard"
+fi
+
+SEED=$((123 + SETTING_INDEX))
+
+echo "Array task:    $SLURM_ARRAY_TASK_ID"
+echo "Setting index: $SETTING_INDEX"
+echo "Difficulty:    $DIFFICULTY"
+echo "Seed:          $SEED"
+echo "CPUs available: ${SLURM_CPUS_PER_TASK}"
 
 python scripts/figure2_experiments.py \
     --config "$CONFIG" \
-    --setting-index "$SLURM_ARRAY_TASK_ID" \
+    --setting-index "$SETTING_INDEX" \
+    --difficulty "$DIFFICULTY" \
     --n-sims "$N_SIMS" \
     --n-tasks 1 \
     --outer-jobs 1 \
-    --out-dir "./scripts/results" \
+    --inner-jobs "$SLURM_CPUS_PER_TASK" \
+    --out-dir "./scripts/results_new" \
     --seed "$SEED"
+    

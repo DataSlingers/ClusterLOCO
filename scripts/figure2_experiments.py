@@ -16,7 +16,7 @@ settings B, B_ramp, B_shapley, patch_batch_size, prediction_cache,
 max_cache_bytes and cache_dir are honored; explicit cache CLI options override
 JSON settings. B_shapley defaults to the previous effective c-SHAP budget, 100.
 Output retains the Figure 2 keys and adds time_cloc_fit, time_cloc_score and
-runtime_config. Both cloc and rampart now use ClusterLOCOMPStream.
+runtime_config. Both cloc and rampart now use ClusterLOCOMPStream which is faster.
 """
 
 import numpy as np
@@ -41,7 +41,7 @@ from clim import RAMPART, GlobalStability_MP
 from clim.data_splitting import Cluster_LOCO_Split
 from clim.minipatches import ClusterLOCOMPStream
 from clim.utils import hinge_error, transform_scores_to_ranking
-from clim.models import BaseSpectralClustering
+from clim.models import BaseSpectralClustering, GammaMixture
 from simulations import BaseSimulator, GenerateCovariances
 from simulations.simulators import permute_feature
 
@@ -301,9 +301,12 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
     # base clusterer (create once per task)  
     if sim_method in {'moon-donut', 'swiss-roll'}:
         base_clusterer = BaseSpectralClustering(n_clusters=K)
-    else:
-    # For GMM and Gamma
+    elif sim_method=='gaussian':
+    # For GMM
         base_clusterer = KMeans(n_clusters=K)
+    else: 
+    # For gamma
+        base_clusterer = GammaMixture(n_components=K)
 
     methods = ["pbfi", "lrp", "impacc", "split_cloc", "cloc", "rampart","perm", "cshap"] # , "rampshap"]
 
@@ -391,6 +394,10 @@ def worker(task_id, cfg, n_sims, seed, out_dir, inner_n_jobs):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", type=str, required=True)
+    ap.add_argument("--setting-index", type=int, required=True,
+                    help="Index of experiment setting in config['experiments']")
+    ap.add_argument("--difficulty", type=str, required=True, choices=("easy", "hard"),
+                    help="Difficulty regime from cfg['difficulty_regimes']")
     ap.add_argument("--n-sims", type=int, required=True)
     ap.add_argument("--out-dir", type=str, required=True)
     ap.add_argument("--seed", type=int, default=123)
@@ -413,22 +420,81 @@ def main():
         ap.error("patch-batch-size must be positive")
     if args.cache_mib is not None and args.cache_mib < 0:
         ap.error("cache-mib must be nonnegative")
-
+        
+    # Loading configurations 
     with open(args.config, "r") as f:
         cfg_all = json.load(f)
+        
+    experiments = cfg_all["experiments"]
+    difficulty_regimes = cfg_all["difficulty_regimes"]
+    
+    setting_names = list(experiments.keys())
+    if not 0 <= args.setting_index < len(setting_names):
+        ap.error(f"--setting-index must be between 0 and {len(setting_names) - 1}; "
+            f"got {args.setting_index}")
+    setting_name = setting_names[args.setting_index]
+    setting = experiments[setting_name]
+    if "shared" not in setting:
+        raise KeyError(f"Experiment '{setting_name}' does not contain a 'shared' configuration")
+    cfg = dict(setting["shared"])
 
-    cfg = dict(cfg_all["experiment"])
-    for key in ("patch_batch_size", "prediction_cache", "cache_dir"):
-        if getattr(args, key) is not None:
-            cfg[key] = getattr(args, key)
+    # Determine simulation family
+    sim_method = cfg.get("sim_method")
+    if sim_method is None:
+        # Infer from setting name if not explicitly stored in shared
+        if setting_name.startswith("gaussian"):
+            sim_method = "gaussian"
+        elif setting_name.startswith("moon-donut"):
+            sim_method = "moon-donut"
+        elif setting_name.startswith("gamma"):
+            sim_method = "gamma"
+        else:
+            raise ValueError(f"Could not determine sim_method for setting '{setting_name}'")
+    cfg["sim_method"] = sim_method
+
+    # Add difficulty-specific parameters
+    if sim_method not in difficulty_regimes:
+        raise KeyError(f"No difficulty regimes defined for simulation method '{sim_method}'")
+    if args.difficulty not in difficulty_regimes[sim_method]:
+        raise KeyError(f"Difficulty '{args.difficulty}' not defined for '{sim_method}'. Available: {list(difficulty_regimes[sim_method])}")
+    difficulty_cfg = difficulty_regimes[sim_method][args.difficulty]
+
+    # Merge difficulty parameters into cfg.
+    # Difficulty-specific values override shared values if duplicated.
+    cfg.update(difficulty_cfg)
+
+    # Metadata
+    cfg["setting_name"] = setting_name
+    cfg["setting_index"] = args.setting_index
+    cfg["difficulty"] = args.difficulty
+
+
+    # Control streaming and caching 
+    if args.patch_batch_size is not None:
+        cfg["patch_batch_size"] = args.patch_batch_size
+    if args.prediction_cache is not None:
+        cfg["prediction_cache"] = args.prediction_cache
+    if args.cache_dir is not None:
+        cfg["cache_dir"] = args.cache_dir
     if args.cache_mib is not None:
         cfg["max_cache_bytes"] = args.cache_mib * 1024**2
+
+    # Default options 
     cfg["outer_jobs"] = args.outer_jobs
     cfg["gaps"] = cfg.get("gaps", [0.2] * int(cfg["K"]))
     cfg["shape_probs"] = cfg.get("shape_probs", {"donut": 0.5, "moon": 0.5})
     cfg["oversample"] = cfg.get("oversample", 10)
-    os.makedirs(args.out_dir, exist_ok=True)
+    setting_out_dir = os.path.join(args.out_dir, setting_name, args.difficulty)
+    os.makedirs(setting_out_dir, exist_ok=True)
 
+    # Checks
+    print("=" * 60)
+    print(f"Setting index : {args.setting_index}")
+    print(f"Setting name  : {setting_name}")
+    print(f"Output dir    : {args.out_dir}")
+    print(f"Seed          : {args.seed}")
+    print("=" * 60)
+    
     with threadpool_limits(limits=1), parallel_config(backend="loky", inner_max_num_threads=1):
         Parallel(n_jobs=args.outer_jobs, verbose=10)(
             delayed(worker)(
@@ -436,11 +502,11 @@ def main():
                 cfg=cfg,
                 n_sims=args.n_sims,
                 seed=args.seed,
-                out_dir=args.out_dir,
+                out_dir=setting_out_dir,
                 inner_n_jobs=args.inner_jobs,
             )
             for task_id in range(args.n_tasks)
         )
-
+    print("Done")
 if __name__ == "__main__":
     main()
