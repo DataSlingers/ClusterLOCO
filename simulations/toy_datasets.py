@@ -51,18 +51,18 @@ def generate_data(n_samples=2000):
 
 ################## Grant example version with 10 D from 2 D
 
-K = 5
-p = 2
+# K = 5
+# p = 2
 
-np.random.seed(42)
+# np.random.seed(42)
 
-Theta_x = np.linspace(-1, 1, K)
-Theta_y = np.random.randn(K) * 0.5
+# Theta_x = np.linspace(-1, 1, K)
+# Theta_y = np.random.randn(K) * 0.5
 
-Theta = np.array([Theta_x, Theta_y]).T
-Vars = np.random.rand(K, p)*0.1
-weights = np.random.rand(K)
-weights = weights / np.sum(weights)
+# Theta = np.array([Theta_x, Theta_y]).T
+# Vars = np.random.rand(K, p)*0.1
+# weights = np.random.rand(K)
+# weights = weights / np.sum(weights)
 
 
 # def generate_data(n_samples=1000, seed=123):

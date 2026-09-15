@@ -30,6 +30,7 @@ from joblib import Parallel, delayed, parallel_config, cpu_count
 from threadpoolctl import threadpool_limits
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.base import clone
 from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
@@ -62,12 +63,12 @@ def _limit_benchmark_threads(function):
     return run
 
 
-def fit_cached_cloc(X, *, K, B, base_clusterer, standardize=True,
+def fit_cached_cloc(X, *, K, B, base_clusterer, base_clf, standardize=True,
                     alpha_N=0.2, alpha_M=0.2, inner_n_jobs=1,
                     patch_batch_size=16, prediction_cache="auto",
                     max_cache_bytes=256 * 1024**2, cache_dir=None):
     """Shared streamed/cached evaluator for ordinary LOCO-MP and RAMPART."""
-    model = ClusterLOCOMPStream(K=K, B=B, base_clusterer=base_clusterer)
+    model = ClusterLOCOMPStream(K=K, B=B, base_clusterer=base_clusterer, base_classifier=base_clf)
     t0 = time.perf_counter()
     model.fit_stream(X, alpha_N=alpha_N, alpha_M=alpha_M,
                      standardize=standardize, n_jobs=inner_n_jobs,
@@ -131,7 +132,7 @@ def generate_dataset_for_one_run(*, sim_method: str, sim_seed: int, embed_seed: 
     
 
 @_limit_benchmark_threads
-def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 10, base_clusterer=None,
+def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 10, base_clusterer=None, base_clf=None,
         B: int = 5000, B_ramp: int = 1000, B_shapley: int = 100,
         standardize: bool = True, topk: int | None = None, inner_n_jobs: int = 1,
         patch_batch_size: int = 16, prediction_cache: str = "auto",
@@ -183,7 +184,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     # ---- Score 3: IMPACC ----
     t0 = time.perf_counter()
     impacc = GlobalStability_MP(X_aug, base_clusterer, n_clusters=K)
-    impacc_res = impacc.impacc(X_aug.T, K=K)
+    impacc_res = impacc.impacc(X_aug.T, K=K, base_clusterer=clone(base_clusterer))
     times['impacc'] = time.perf_counter()-t0
     impacc_raw = np.asarray(impacc_res["feature_importance"], dtype=float).reshape(-1)
     if impacc_raw.size != p:
@@ -195,7 +196,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     print("======== Split Cluster LOCO ========")
     X_tr, X_va, y_tr, y_va = train_test_split(X_aug, y, test_size=0.5, stratify=y)
     t0 = time.perf_counter()
-    split_cloc, _ = Cluster_LOCO_Split(X_tr, X_va, model=base_clusterer, clf = RandomForestClassifier(), K=K,error_metric=None, n_jobs=inner_n_jobs)
+    split_cloc, _ = Cluster_LOCO_Split(X_tr, X_va, model=base_clusterer, clf = base_clf, K=K,error_metric=None, n_jobs=inner_n_jobs)
     times['split_cloc']=time.perf_counter()-t0
     if split_cloc.size != p:
         raise ValueError(f"Cluster LOCO Split returned {split_cloc.size} features, expected {p}")
@@ -205,7 +206,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     print("======== Cluster LOCOMP ========")
     t0 = time.perf_counter()
     cloc_out, g, fit_seconds, score_seconds = fit_cached_cloc(
-        X_aug, K=K, B=B, base_clusterer=base_clusterer,
+        X_aug, K=K, B=B, base_clusterer=base_clusterer, base_clf=base_clf,
         standardize=standardize, **cache_options)
     phase_times.update(cloc_fit=fit_seconds, cloc_score=score_seconds)
     times['cloc']=time.perf_counter() - t0
@@ -226,7 +227,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     print('======= ClusterLOCO RAMPART =======')
     def gen_fn(X_sub, *, B, alpha_N, alpha_M, **_ignored):
         scores, model, _, _ = fit_cached_cloc(
-            X_sub, K=K, B=B, base_clusterer=base_clusterer,
+            X_sub, K=K, B=B, base_clusterer=base_clusterer, base_clf=base_clf,
             alpha_N=alpha_N, alpha_M=alpha_M,
             standardize=standardize, **cache_options)
         return dict(scores, z_ref=model.z_ref), model
@@ -288,6 +289,10 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
     cfg = dict(B=5000, B_ramp=1000, B_shapley=100, patch_batch_size=16,
                prediction_cache="auto", max_cache_bytes=256 * 1024**2,
                cache_dir=None, standardize=True) | cfg
+
+    # Forced rerun overriding current values 
+    cfg.update(B=2000, B_ramp=500)
+    
     # experiment constants
     sim_method = cfg.get("sim_method", "non-gaussian")
     K = int(cfg["K"])
@@ -301,13 +306,20 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
     # base clusterer (create once per task)  
     if sim_method in {'moon-donut', 'swiss-roll'}:
         base_clusterer = BaseSpectralClustering(n_clusters=K)
+        base_clf = RandomForestClassifier(n_jobs=1)
     elif sim_method=='gaussian':
     # For GMM
         base_clusterer = KMeans(n_clusters=K)
+        base_clf = DecisionTreeClassifier(random_state=0)
     else: 
     # For gamma
+        standardize = False
         base_clusterer = GammaMixture(n_components=K)
+        base_clf = RandomForestClassifier(n_jobs=1)
 
+    cfg['base_classifier'] = type(base_clf).__name__
+    cfg['base_classifier_params'] = base_clf.get_params(deep=False)
+    
     methods = ["pbfi", "lrp", "impacc", "split_cloc", "cloc", "rampart","perm", "cshap"] # , "rampshap"]
 
     phase_times = {m: np.zeros(n_sims) for m in ("cloc_fit", "cloc_score")}
@@ -340,6 +352,7 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
             K=K,
             informative_d=informative_d,
             noise_d=noise_d,
+            base_clf=base_clf,
             base_clusterer=base_clusterer,
             B=int(cfg.get("B", 5000)),
             B_ramp=int(cfg.get("B_ramp", 1000)),
@@ -381,15 +394,8 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
 
 #  Parallelize on simulations 
 def worker(task_id, cfg, n_sims, seed, out_dir, inner_n_jobs):
-    run_chunk(
-        cfg=cfg,
-        cfg_id=0,
-        n_sims=n_sims,
-        task_id=task_id,
-        global_seed=seed,
-        out_dir=out_dir,
-        inner_n_jobs=inner_n_jobs,
-    )
+    run_chunk(cfg=cfg, cfg_id=0, n_sims=n_sims, task_id=task_id, global_seed=seed,
+        out_dir=out_dir, inner_n_jobs=inner_n_jobs,)
 
 def main():
     ap = argparse.ArgumentParser()
