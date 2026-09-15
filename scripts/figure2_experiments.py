@@ -95,6 +95,9 @@ def generate_dataset_for_one_run(*, sim_method: str, sim_seed: int, embed_seed: 
        {"type":"triangular","d":10,"low":-1,"high":1},
        {"type":"laplace","d":10,"scale":1.0}]
     """
+    if sim_method == "gamma" and d0 != informative_d:
+        raise ValueError("Gamma experiments require d0 == informative_d to preserve Gamma features.")
+
     # Adds correlation in signal
     Cov_k = [GenerateCovariances(dim=d0, covMethod='onion', eta=1/(k+1)).covGen()[0] for k in range(K)]
 
@@ -313,7 +316,7 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
         base_clf = DecisionTreeClassifier(random_state=0)
     else: 
     # For gamma
-        standardize = False
+        cfg["standardize"] = False
         base_clusterer = GammaMixture(n_components=K)
         base_clf = RandomForestClassifier(n_jobs=1)
 

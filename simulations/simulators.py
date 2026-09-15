@@ -1037,10 +1037,11 @@ class BaseSimulator:
     def add_noise(self, noise_d, noise_type='gaussian', **kwargs):
         """
         Add noise dimensions can be using following distributions:
-        {"gaussian", "student-t", "uniform", "triangular", "laplace"}.
+        {"gaussian", "gamma", "student-t", "uniform", "triangular", "laplace"}.
 
         kwargs :
             Distribution-specific parameters:
+                gamma     : shape (default=2.0), scale (default=1.0)
                 student-t : df (default=5)
                 uniform   : low (default=-1), high (default=1)
                 triangular: low (default=-1), high (default=1), mode (default=0)
@@ -1049,6 +1050,12 @@ class BaseSimulator:
         n = self.n
         if noise_type == "gaussian":
             X_noise = self.rng.normal(size=(n, noise_d))
+        elif noise_type == "gamma":
+            shape = float(kwargs.get("shape", 2.0))
+            scale = float(kwargs.get("scale", 1.0))
+            if not np.isfinite(shape) or not np.isfinite(scale) or shape <= 0 or scale <= 0:
+                raise ValueError("Gamma noise shape and scale must be finite and strictly positive.")
+            X_noise = self.rng.gamma(shape=shape, scale=scale, size=(n, noise_d))
     
         elif noise_type == "student-t":
             df = kwargs.get("df", 5)

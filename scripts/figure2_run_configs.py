@@ -139,48 +139,33 @@ EXPERIMENTS = {
     ),
     "gamma_20": make_exp(
         "gamma_20",
-        d0 = 10,
+        d0=10,
         sim_method="gamma",
-        noise_plan=[
-            {"type": "uniform", "d": 10},
-        ],
+        noise_plan=[{"type": "gamma", "d": 10, "shape": 2.0, "scale": 1.0}],
     ),
     "gamma_50": make_exp(
         "gamma_50",
-        d0 = 10,
+        d0=10,
         sim_method="gamma",
-        noise_plan=[
-            {"type": "uniform", "d": 20},
-            {"type": "gaussian", "d": 20},
-        ],
+        noise_plan=[{"type": "gamma", "d": 40, "shape": 2.0, "scale": 1.0}],
     ),
     "gamma_200": make_exp(
         "gamma_200",
-        d0 = 10,
+        d0=10,
         sim_method="gamma",
-        noise_plan=[
-            {"type": "uniform", "d": 100},
-            {"type": "gaussian", "d": 90},
-        ],
+        noise_plan=[{"type": "gamma", "d": 190, "shape": 2.0, "scale": 1.0}],
     ),
     "gamma_500": make_exp(
         "gamma_500",
-        d0 = 10,
+        d0=10,
         sim_method="gamma",
-        noise_plan=[
-            {"type": "uniform", "d": 95},
-            {"type": "gaussian", "d": 95},
-        ],
+        noise_plan=[{"type": "gamma", "d": 490, "shape": 2.0, "scale": 1.0}],
     ),
     "gamma_1000": make_exp(
         "gamma_1000",
-        d0 = 10,
+        d0=10,
         sim_method="gamma",
-        noise_plan=[
-            {"type": "permuted", "d": 200},
-            {"type": "uniform", "d": 500},
-            {"type": "gaussian", "d": 290},
-        ],
+        noise_plan=[{"type": "gamma", "d": 990, "shape": 2.0, "scale": 1.0}],
     ),
 }
 

@@ -17,9 +17,45 @@ from sklearn.datasets import make_blobs
 from clim.minipatches import ClusterLOCOMP, ClusterLOCOMPStream
 from clim.utils import hinge_error
 from scripts import figure2_experiments as figure2
+from scripts.figure2_run_configs import EXPERIMENTS
 
 
 class Figure2Tests(unittest.TestCase):
+    def test_gamma_configs_generate_positive_unscaled_features(self):
+        for name, setting in EXPERIMENTS.items():
+            if not name.startswith("gamma_"):
+                continue
+            cfg = setting["shared"]
+            kwargs = dict(sim_method="gamma", sim_seed=10, embed_seed=11,
+                          K=2, n_per_cluster=12, alpha=2, d0=cfg["d0"],
+                          informative_d=cfg["informative_d"], gaps=[0.2]*2,
+                          shape_probs={}, oversample=10, noise_plan=cfg["noise_plan"])
+            X, y = figure2.generate_dataset_for_one_run(**kwargs)
+            self.assertEqual(X.shape, (24, int(name.split("_")[1])))
+            self.assertTrue(np.isfinite(X).all())
+            self.assertTrue((X > 0).all())
+            self.assertTrue(all(b["type"] == "gamma" for b in cfg["noise_plan"]))
+            if name == "gamma_20":
+                model = figure2.GammaMixture(n_components=2, max_iter=2, random_state=10)
+                self.assertEqual(model.fit_predict(X).shape, y.shape)
+                with self.assertRaisesRegex(ValueError, "d0 == informative_d"):
+                    figure2.generate_dataset_for_one_run(**(kwargs | {"d0": 2}))
+
+    def test_gamma_chunk_disables_standardization(self):
+        methods = ["pbfi", "lrp", "impacc", "split_cloc", "cloc", "rampart", "perm", "cshap"]
+        result = {key: dict.fromkeys(methods, 0.5) for key in ("times", "ari", "topk_recall")}
+        result["phase_times"] = {"cloc_fit": 0.2, "cloc_score": 0.3}
+        cfg = EXPERIMENTS["gamma_20"]["shared"] | {"alpha": 2, "standardize": True}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(figure2, "run_one_simulation", return_value=result) as run, \
+             contextlib.redirect_stdout(io.StringIO()):
+            figure2.run_chunk(cfg=cfg, cfg_id=0, n_sims=1, task_id=0,
+                              global_seed=10, out_dir=directory)
+            self.assertFalse(run.call_args.kwargs["standardize"])
+            self.assertIsInstance(run.call_args.kwargs["base_clusterer"], figure2.GammaMixture)
+            with np.load(Path(directory) / "results_task00000.npz") as saved:
+                self.assertFalse(json.loads(saved["runtime_config"].item())["standardize"])
+
     @classmethod
     def setUpClass(cls):
         cls.X, cls.y = make_blobs(n_samples=96, n_features=20, centers=3, random_state=10)
