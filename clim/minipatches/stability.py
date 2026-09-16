@@ -188,10 +188,7 @@ class GlobalStability_MP():
     
         labels_final = self._final_clusterer_(Co, K, algo=final_algo)
     
-        return dict(
-            ConsensusMatrix=Co,
-            labels=labels_final,
-        )
+        return dict(ConsensusMatrix=Co, labels=labels_final)
     
     def impacc(self, X, K, reps= 300, p_item = 0.25, p_feature = 0.10, adaptive_feature = True,
                qI = 0.95,          # high-uncertainty (obs) percentile
@@ -200,7 +197,7 @@ class GlobalStability_MP():
                alpha_F = 0.5,      # feat weight 
                pp = 0.05,          # feature support threshold (p-value quantile)
                E = 3,               # epochs for burn-in
-               base_clusterer = None, final_algo = "agglomerative", early_stop = True, 
+               base_clusterer = None, final_algo = "agglomerative", early_stop = True, standardize=False,
                num_unchange = 5, eps = 1e-5, verbose = True):
         """
         Interpretable MP Adaptive Consensus Clustering:
@@ -210,7 +207,7 @@ class GlobalStability_MP():
         X = np.asarray(X)
         if X.ndim != 2:
             raise ValueError("X must be 2D array (features x samples).")
-        Xs = self._scale_matrix_(X)
+        Xs = self._scale_matrix_(X) if standardize else X
 
         n_feat, n_samp = Xs.shape
         if base_clusterer is None:

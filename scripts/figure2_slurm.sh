@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --account=stats
-#SBATCH --job-name=fig2_gamma
-#SBATCH --output=logs/fig2_all_%A_%a.out
-#SBATCH --error=logs/fig2_all_%A_%a.err
-#SBATCH --array=10-14 # 0-14 easy, 15-29 hard with 0: gaussian_20, 1: gaussian_50, 2: gaussian_200, 3: gaussian_500, 4: gaussian_1000, 5: moon_20, 6: moon_50, 7: moon_200, 8: moon_500, 9: moon_1000, 10: gamma_20, 11: gamma_50, 12: gamma_200, 13: gamma_500, 14: gamma_1000
+#SBATCH --job-name=n500
+#SBATCH --output=logs/N500_all_%A_%a.out
+#SBATCH --error=logs/N500_all_%A_%a.err
+#SBATCH --array=0-14 # 0-14 easy, 15-29 hard with 0: gaussian_20, 1: gaussian_50, 2: gaussian_200, 3: gaussian_500, 4: gaussian_1000, 5: moon_20, 6: moon_50, 7: moon_200, 8: moon_500, 9: moon_1000, 10: gamma_20, 11: gamma_50, 12: gamma_200, 13: gamma_500, 14: gamma_1000
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=12:00:00
@@ -27,7 +27,7 @@ export NUMEXPR_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 export SLURM_CPUS_PER_TASK="${SLURM_CPUS_PER_TASK:-4}"
 
-CONFIG="./scripts/cfgs/experiments.json"
+CONFIG="./scripts/cfgs/experiments_N500.json" # "./scripts/cfgs/experiments.json" # original run
 N_SIMS=10
 mkdir -p logs
 
@@ -57,6 +57,6 @@ python scripts/figure2_experiments.py \
     --n-tasks 1 \
     --outer-jobs 1 \
     --inner-jobs "$SLURM_CPUS_PER_TASK" \
-    --out-dir "./scripts/results_2000" \
+    --out-dir "./scripts/results_N500" \
     --seed "$SEED"
     

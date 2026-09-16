@@ -1,10 +1,10 @@
 from pathlib import Path
 import json
 from copy import deepcopy
-
+N = 500 # base 200
 BASE = {
     "K": 7,
-    "n_per_cluster": 200,
+    "n_per_cluster": N,
     "sim_seed": 123,
     "embed_seed": 123,
     "d0": 10,
@@ -170,7 +170,7 @@ EXPERIMENTS = {
 }
 
 
-def write_config(path="./cfgs/experiments.json"):
+def write_config(path=f"./cfgs/experiments_N{N}.json"):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 

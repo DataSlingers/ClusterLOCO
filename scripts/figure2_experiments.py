@@ -187,7 +187,7 @@ def run_one_simulation(*, X_aug, y, K: int, noise_d: int, informative_d: int = 1
     # ---- Score 3: IMPACC ----
     t0 = time.perf_counter()
     impacc = GlobalStability_MP(X_aug, base_clusterer, n_clusters=K)
-    impacc_res = impacc.impacc(X_aug.T, K=K, base_clusterer=clone(base_clusterer))
+    impacc_res = impacc.impacc(X_aug.T, K=K, base_clusterer=clone(base_clusterer), standardize=standardize)
     times['impacc'] = time.perf_counter()-t0
     impacc_raw = np.asarray(impacc_res["feature_importance"], dtype=float).reshape(-1)
     if impacc_raw.size != p:
@@ -293,8 +293,8 @@ def run_chunk(*, cfg: dict, cfg_id: int, n_sims: int, task_id: int, global_seed:
                prediction_cache="auto", max_cache_bytes=256 * 1024**2,
                cache_dir=None, standardize=True) | cfg
 
-    # Forced rerun overriding current values 
-    cfg.update(B=2000, B_ramp=500)
+    # # Forced rerun overriding current values 
+    # cfg.update(B=2000, B_ramp=500)
     
     # experiment constants
     sim_method = cfg.get("sim_method", "non-gaussian")
