@@ -46,7 +46,7 @@ from .prototypes import *
 import sys
 sys.path.append("../")
 from clim.utils.model_selection import *
-from clim.utils import match_labels_generalized
+# from clim.utils import match_labels_generalized
 from clim.utils.utils import *
 
 class Fuzzy_CSHAP_explainer:
