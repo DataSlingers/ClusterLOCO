@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Monte Carlo Cluster LOCO-MP target from Supp_population_target.ipynb.
 
-See supp_population_target.md for SLURM, restart, and output instructions.
+See instructions.md for SLURM, restart, and output instructions.
 """
 import argparse
 from contextlib import redirect_stderr
